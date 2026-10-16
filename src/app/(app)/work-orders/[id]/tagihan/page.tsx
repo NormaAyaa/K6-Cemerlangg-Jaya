@@ -1,4 +1,4 @@
-import { notFound, redirect } from "next/navigation";
+import { notFound } from "next/navigation";
 import { TabWorkOrder } from "@/components/TabWorkOrder";
 import { ambilProfilSaya } from "@/lib/profil";
 import { createClient } from "@/lib/supabase/server";

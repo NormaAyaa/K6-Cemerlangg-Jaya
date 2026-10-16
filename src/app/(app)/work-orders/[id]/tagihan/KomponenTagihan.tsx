@@ -8,13 +8,9 @@ import {
   Plus,
   Trash2,
   Pencil,
-  AlertTriangle,
   CreditCard,
   Percent,
-  CheckCircle2,
   Info,
-  Clock,
-  ArrowRight,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -337,7 +333,7 @@ export function KomponenTagihan({
   // 5. Terbitkan Invoice
   const handleTerbitkanInvoice = async () => {
     startTransition(async () => {
-      const { data: idInv, error } = await supabase.rpc("terbitkan_invoice", {
+      const { error } = await supabase.rpc("terbitkan_invoice", {
         p_wo: woId,
       });
 
