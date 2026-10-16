@@ -154,16 +154,25 @@ export default async function InvoiceWorkOrder({
       <div className="bg-white border border-border shadow-md rounded-xl p-8 sm:p-12 text-slate-800 print:border-none print:shadow-none print:p-0 print:m-0 print:rounded-none">
         {/* Header Bengkel */}
         <div className="flex flex-wrap items-start justify-between gap-6 pb-6 border-b-2 border-slate-800">
-          <div className="space-y-1">
-            <h1 className="text-2xl font-black tracking-tight text-slate-900 uppercase">
-              {settings?.nama || "Cemerlang Jaya Motor"}
-            </h1>
-            <p className="text-xs text-slate-600 max-w-sm leading-relaxed">
-              {settings?.alamat || "Jl. Raya Otomotif No. 88, Jakarta"}
-            </p>
-            <p className="text-xs text-slate-600">
-              Telp / WhatsApp: {settings?.telepon || "0812-3456-7890"} · Jam Buka: {settings?.jam_buka || "Senin - Sabtu (08.00 - 17.00)"}
-            </p>
+          <div className="flex items-start gap-4">
+            {logoUrl && (
+              <img
+                src={logoUrl}
+                alt={settings?.nama || "Logo Bengkel"}
+                className="h-16 w-auto max-w-[120px] object-contain"
+              />
+            )}
+            <div className="space-y-1">
+              <h1 className="text-2xl font-black tracking-tight text-slate-900 uppercase">
+                {settings?.nama || "Cemerlang Jaya Motor"}
+              </h1>
+              <p className="text-xs text-slate-600 max-w-sm leading-relaxed">
+                {settings?.alamat || "Jl. Raya Otomotif No. 88, Jakarta"}
+              </p>
+              <p className="text-xs text-slate-600">
+                Telp / WhatsApp: {settings?.telepon || "0812-3456-7890"} · Jam Buka: {settings?.jam_buka || "Senin - Sabtu (08.00 - 17.00)"}
+              </p>
+            </div>
           </div>
 
           <div className="text-right">
