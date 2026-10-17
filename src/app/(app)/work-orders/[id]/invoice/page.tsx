@@ -155,6 +155,7 @@ export default async function InvoiceWorkOrder({
         <div className="flex flex-wrap items-start justify-between gap-6 pb-6 border-b-2 border-slate-800">
           <div className="flex items-start gap-4">
             {logoUrl && (
+              /* eslint-disable-next-line @next/next/no-img-element */
               <img
                 src={logoUrl}
                 alt={settings?.nama || "Logo Bengkel"}
