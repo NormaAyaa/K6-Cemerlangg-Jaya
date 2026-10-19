@@ -767,7 +767,31 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      buat_work_order: {
+        Args: {
+          p_vehicle_id: string
+          p_kepala_mekanik_id: string
+          p_odometer: number
+          p_keluhan: string
+        }
+        Returns: string
+      }
+      tugaskan_mekanik: {
+        Args: {
+          p_wo: string
+          p_mekanik: string[]
+          p_estimasi: string
+        }
+        Returns: undefined
+      }
+      ubah_status_wo: {
+        Args: {
+          p_wo: string
+          p_status: string
+          p_catatan?: string | null
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       [_ in never]: never
