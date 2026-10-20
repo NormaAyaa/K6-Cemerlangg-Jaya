@@ -1,7 +1,9 @@
+import { headers } from "next/headers";
 import { redirect } from "next/navigation";
 import { ambilProfilSaya } from "@/lib/profil";
 import { createClient } from "@/lib/supabase/server";
 import { FormSetelan } from "./FormSetelan";
+import { PaymentGatewaySetelan } from "./PaymentGatewaySetelan";
 
 export default async function HalamanSetelan() {
   const profil = await ambilProfilSaya();
@@ -28,6 +30,33 @@ export default async function HalamanSetelan() {
     galeri_paths: [],
   };
 
+  // Cek ketersediaan env di server tanpa menampilkan nilainya
+  const hasMayarApiKey = Boolean(process.env.MAYAR_API_KEY?.trim());
+  const hasSupabaseSecretKey = Boolean(process.env.SUPABASE_SECRET_KEY?.trim());
+  const terhubung = hasMayarApiKey && hasSupabaseSecretKey;
+  const baseUrl = process.env.MAYAR_BASE_URL?.trim() || "https://api.mayar.io/hl/v2";
+  const mode = "Sandbox";
+
+  // Ambil host dari header request di server (otomatis menampilkan domain Netlify saat di Netlify)
+  const headerList = await headers();
+  const host =
+    headerList.get("x-forwarded-host") ||
+    headerList.get("host") ||
+    "localhost:3000";
+  const proto =
+    headerList.get("x-forwarded-proto") ||
+    (host.startsWith("localhost") || host.startsWith("127.0.0.1") ? "http" : "https");
+  const webhookUrl = `${proto}://${host}/api/webhook/mayar`;
+
+  // Ambil 10 baris terakhir log webhook Mayar khusus Owner
+  const { data: rawLogs } = await supabase
+    .from("mayar_webhook_log")
+    .select("id, event, mayar_invoice_id, status, alasan, created_at")
+    .order("created_at", { ascending: false })
+    .limit(10);
+
+  const webhookLogs = rawLogs ?? [];
+
   return (
     <div className="space-y-6">
       <div>
@@ -38,6 +67,18 @@ export default async function HalamanSetelan() {
       </div>
 
       <FormSetelan setelan={dataBengkel} />
+
+      {/* Bagian Payment Gateway Khusus Owner */}
+      <PaymentGatewaySetelan
+        terhubung={terhubung}
+        hasMayarApiKey={hasMayarApiKey}
+        hasSupabaseSecretKey={hasSupabaseSecretKey}
+        mode={mode}
+        baseUrl={baseUrl}
+        webhookUrl={webhookUrl}
+        logs={webhookLogs}
+      />
     </div>
   );
 }
+
