@@ -250,10 +250,14 @@ export type Database = {
       }
       invoices: {
         Row: {
+          dibayar_online_at: string | null
           diskon: number
           diterbitkan_at: string
           diterbitkan_oleh: string | null
           id: string
+          mayar_invoice_id: string | null
+          mayar_jumlah: number | null
+          mayar_link: string | null
           nomor: string
           status_bayar: string
           subtotal: number
@@ -262,10 +266,14 @@ export type Database = {
           work_order_id: string
         }
         Insert: {
+          dibayar_online_at?: string | null
           diskon?: number
           diterbitkan_at?: string
           diterbitkan_oleh?: string | null
           id?: string
+          mayar_invoice_id?: string | null
+          mayar_jumlah?: number | null
+          mayar_link?: string | null
           nomor: string
           status_bayar?: string
           subtotal: number
@@ -274,10 +282,14 @@ export type Database = {
           work_order_id: string
         }
         Update: {
+          dibayar_online_at?: string | null
           diskon?: number
           diterbitkan_at?: string
           diterbitkan_oleh?: string | null
           id?: string
+          mayar_invoice_id?: string | null
+          mayar_jumlah?: number | null
+          mayar_link?: string | null
           nomor?: string
           status_bayar?: string
           subtotal?: number
@@ -301,6 +313,36 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      mayar_webhook_log: {
+        Row: {
+          alasan: string | null
+          created_at: string
+          event: string | null
+          id: string
+          mayar_invoice_id: string | null
+          payload: Json
+          status: string
+        }
+        Insert: {
+          alasan?: string | null
+          created_at?: string
+          event?: string | null
+          id?: string
+          mayar_invoice_id?: string | null
+          payload: Json
+          status: string
+        }
+        Update: {
+          alasan?: string | null
+          created_at?: string
+          event?: string | null
+          id?: string
+          mayar_invoice_id?: string | null
+          payload?: Json
+          status?: string
+        }
+        Relationships: []
       }
       mekanik: {
         Row: {
@@ -771,23 +813,19 @@ export type Database = {
         Args: { p_alasan: string; p_diskon: number; p_wo: string }
         Returns: undefined
       }
+      buat_work_order: {
+        Args: {
+          p_keluhan: string
+          p_kepala_mekanik_id: string
+          p_odometer: number
+          p_vehicle_id: string
+        }
+        Returns: string
+      }
       catat_pembayaran: {
         Args: { p_invoice: string; p_jumlah: number; p_metode: string }
         Returns: undefined
       }
-      hapus_item_tagihan: {
-        Args: { p_billing_item: string }
-        Returns: undefined
-      }
-      sesuaikan_harga_item: {
-        Args: { p_alasan: string; p_billing_item: string; p_harga: number }
-        Returns: boolean
-      }
-      tambah_item_tagihan: {
-        Args: { p_item: string; p_jumlah: number; p_wo: string }
-        Returns: string
-      }
-      terbitkan_invoice: { Args: { p_wo: string }; Returns: string }
       catat_stok_masuk: {
         Args: { p_item: string; p_jumlah: number; p_keterangan?: string }
         Returns: undefined
@@ -844,6 +882,10 @@ export type Database = {
           tanggal: string
         }[]
       }
+      hapus_item_tagihan: {
+        Args: { p_billing_item: string }
+        Returns: undefined
+      }
       laporan_laba: {
         Args: { p_dari: string; p_sampai: string }
         Returns: {
@@ -858,33 +900,38 @@ export type Database = {
           work_order_id: string
         }[]
       }
+      sesuaikan_harga_item: {
+        Args: { p_alasan: string; p_billing_item: string; p_harga: number }
+        Returns: boolean
+      }
       sesuaikan_stok: {
         Args: { p_alasan: string; p_item: string; p_stok_fisik: number }
         Returns: undefined
       }
-      buat_work_order: {
+      simpan_link_mayar: {
         Args: {
-          p_vehicle_id: string
-          p_kepala_mekanik_id: string
-          p_odometer: number
-          p_keluhan: string
-        }
-        Returns: string
-      }
-      tugaskan_mekanik: {
-        Args: {
-          p_wo: string
-          p_mekanik: string[]
-          p_estimasi: string
+          p_invoice_id: string
+          p_mayar_invoice_id: string
+          p_mayar_jumlah: number
+          p_mayar_link: string
         }
         Returns: undefined
       }
+      tambah_item_tagihan: {
+        Args: { p_item: string; p_jumlah: number; p_wo: string }
+        Returns: string
+      }
+      tandai_lunas_mayar: {
+        Args: { p_invoice_id?: string; p_mayar_invoice_id: string }
+        Returns: undefined
+      }
+      terbitkan_invoice: { Args: { p_wo: string }; Returns: string }
+      tugaskan_mekanik: {
+        Args: { p_estimasi: string; p_mekanik: string[]; p_wo: string }
+        Returns: undefined
+      }
       ubah_status_wo: {
-        Args: {
-          p_wo: string
-          p_status: string
-          p_catatan?: string | null
-        }
+        Args: { p_catatan?: string; p_status: string; p_wo: string }
         Returns: undefined
       }
     }

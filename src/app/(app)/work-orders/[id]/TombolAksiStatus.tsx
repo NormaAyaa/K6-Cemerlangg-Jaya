@@ -85,7 +85,7 @@ export function TombolAksiStatus({
       const { error } = await supabase.rpc("ubah_status_wo", {
         p_wo: woId,
         p_status: statusTujuan,
-        p_catatan: catatan?.trim() || null,
+        p_catatan: catatan?.trim() || undefined,
       });
 
       if (error) {
@@ -203,7 +203,7 @@ export function TombolAksiStatus({
 
       if (error) throw new Error(error.message);
 
-      toast.success("Mobil berhasil diserahkan kepada pelanggan!");
+      toast.success("Motor berhasil diserahkan kepada pelanggan!");
       setDialogSerahkan(false);
       router.refresh();
     } catch (err: any) {

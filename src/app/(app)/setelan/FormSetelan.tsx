@@ -62,7 +62,11 @@ export function FormSetelan({ setelan }: Props) {
       initialQuality: 0.8,
     };
     try {
-      return await imageCompression(file, opsi);
+      const compressed = await imageCompression(file, opsi);
+      if (compressed instanceof File) return compressed;
+      return new File([compressed], file.name.replace(/\.[^.]+$/, ".webp"), {
+        type: "image/webp",
+      });
     } catch {
       return file;
     }

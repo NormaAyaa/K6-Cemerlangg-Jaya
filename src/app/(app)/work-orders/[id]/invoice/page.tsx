@@ -3,7 +3,7 @@ import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
-import { rupiah, tanggal } from "@/lib/format";
+import { rupiah, tanggal, tanggalWaktu } from "@/lib/format";
 import { ambilProfilSaya } from "@/lib/profil";
 import { createClient } from "@/lib/supabase/server";
 import { TombolCetak } from "./TombolCetak";
@@ -36,6 +36,8 @@ export default async function InvoiceWorkOrder({
       status_bayar,
       diterbitkan_at,
       diterbitkan_oleh,
+      mayar_link,
+      dibayar_online_at,
       kasir:profiles!diterbitkan_oleh (nama)
     `)
     .eq("work_order_id", id)
@@ -147,7 +149,13 @@ export default async function InvoiceWorkOrder({
   return (
     <div className="max-w-4xl mx-auto py-4">
       {/* Tombol Aksi di Layar (Sembunyi saat Cetak) */}
-      <TombolCetak woId={id} />
+      <TombolCetak
+        woId={id}
+        invoiceId={rawInvoice.id}
+        statusBayarAwal={rawInvoice.status_bayar}
+        dibayarOnlineAtAwal={rawInvoice.dibayar_online_at}
+        peran={profil.peran}
+      />
 
       {/* Lembar Invoice A4 Siap Cetak */}
       <div className="bg-white border border-border shadow-md rounded-xl p-8 sm:p-12 text-slate-800 print:border-none print:shadow-none print:p-0 print:m-0 print:rounded-none">
@@ -273,6 +281,19 @@ export default async function InvoiceWorkOrder({
                     : "BELUM BAYAR"}
                 </span>
               </div>
+              {statusBayar === "lunas" && (
+                <p className="text-[11px] text-slate-500 mt-1.5">
+                  Waktu dibayar:{" "}
+                  <span className="font-semibold text-slate-800">
+                    {tanggalWaktu(
+                      rawInvoice.dibayar_online_at ||
+                        (payments && payments.length > 0
+                          ? payments[payments.length - 1].created_at
+                          : rawInvoice.diterbitkan_at),
+                    )}
+                  </span>
+                </p>
+              )}
             </div>
 
             {/* Riwayat Pembayaran (jika ada) */}
