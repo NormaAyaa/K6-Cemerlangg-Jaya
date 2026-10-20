@@ -767,6 +767,27 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      atur_diskon: {
+        Args: { p_alasan: string; p_diskon: number; p_wo: string }
+        Returns: undefined
+      }
+      catat_pembayaran: {
+        Args: { p_invoice: string; p_jumlah: number; p_metode: string }
+        Returns: undefined
+      }
+      hapus_item_tagihan: {
+        Args: { p_billing_item: string }
+        Returns: undefined
+      }
+      sesuaikan_harga_item: {
+        Args: { p_alasan: string; p_billing_item: string; p_harga: number }
+        Returns: boolean
+      }
+      tambah_item_tagihan: {
+        Args: { p_item: string; p_jumlah: number; p_wo: string }
+        Returns: string
+      }
+      terbitkan_invoice: { Args: { p_wo: string }; Returns: string }
       catat_stok_masuk: {
         Args: { p_item: string; p_jumlah: number; p_keterangan?: string }
         Returns: undefined
