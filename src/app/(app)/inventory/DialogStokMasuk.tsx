@@ -66,41 +66,64 @@ export function DialogStokMasuk({
       open={buka}
       onOpenChange={(v) => {
         setBuka(v);
-        if (!v) form.reset();
+        if (!v) form.reset({ jumlah: 1, keterangan: "" });
       }}
     >
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
-          <ArrowDownToLine className="size-3.5" />
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 gap-1.5 text-xs border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:bg-zinc-800 hover:text-white hover:border-emerald-500/40"
+        >
+          <ArrowDownToLine className="size-3.5 text-emerald-400" />
           Stok Masuk
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="bg-[#111116] border border-zinc-800 text-white sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Catat Stok Masuk</DialogTitle>
+          <DialogTitle className="text-white text-base font-semibold">
+            Catat Stok Masuk
+          </DialogTitle>
         </DialogHeader>
-        <div className="mb-2 rounded-lg bg-bg-app p-3 text-sm">
-          <p className="font-medium text-text">{item.nama}</p>
-          <p className="text-text-muted">Stok saat ini: <span className="font-semibold text-text">{item.stok}</span></p>
+        <div className="mb-2 rounded-lg bg-zinc-900/80 border border-zinc-800 p-3 text-sm">
+          <p className="font-semibold text-white">{item.nama}</p>
+          <p className="text-zinc-400 text-xs mt-0.5">
+            Stok saat ini:{" "}
+            <span className="font-mono font-bold text-white">{item.stok}</span>
+          </p>
         </div>
-        <form id={`form-stok-masuk-${item.id}`} onSubmit={form.handleSubmit(simpan)} noValidate>
+        <form
+          id={`form-stok-masuk-${item.id}`}
+          onSubmit={form.handleSubmit(simpan)}
+          noValidate
+        >
           <FieldGroup className="gap-4">
             <Controller
               name="jumlah"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={`jumlah-${item.id}`}>Jumlah Masuk *</FieldLabel>
+                  <FieldLabel
+                    htmlFor={`jumlah-${item.id}`}
+                    className="text-zinc-300 text-xs font-medium"
+                  >
+                    Jumlah Masuk *
+                  </FieldLabel>
                   <Input
                     id={`jumlah-${item.id}`}
                     type="number"
                     min={1}
                     value={field.value ?? 1}
-                    onChange={(e) => field.onChange(e.target.value === "" ? 0 : Number(e.target.value))}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value === "" ? 0 : Number(e.target.value)
+                      )
+                    }
                     onBlur={field.onBlur}
                     name={field.name}
                     ref={field.ref}
                     aria-invalid={fieldState.invalid}
+                    className="border-zinc-800 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:border-primary/50 text-xs"
                   />
                   <FieldError errors={[fieldState.error]} />
                 </Field>
@@ -111,23 +134,30 @@ export function DialogStokMasuk({
               control={form.control}
               render={({ field }) => (
                 <Field>
-                  <FieldLabel htmlFor={`keterangan-${item.id}`}>Keterangan (misal: Pembelian dari Toko X)</FieldLabel>
+                  <FieldLabel
+                    htmlFor={`keterangan-${item.id}`}
+                    className="text-zinc-300 text-xs font-medium"
+                  >
+                    Keterangan (misal: Pembelian dari Toko X)
+                  </FieldLabel>
                   <Textarea
                     {...field}
                     id={`keterangan-${item.id}`}
                     rows={2}
                     placeholder="Catatan sumber stok atau nomor faktur beli"
+                    className="border-zinc-800 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:border-primary/50 text-xs resize-none"
                   />
                 </Field>
               )}
             />
           </FieldGroup>
         </form>
-        <DialogFooter>
+        <DialogFooter className="gap-2 sm:gap-0">
           <Button
             type="submit"
             form={`form-stok-masuk-${item.id}`}
             disabled={form.formState.isSubmitting}
+            className="bg-primary hover:bg-primary-strong text-white font-medium text-xs shadow-xs"
           >
             {form.formState.isSubmitting ? "Menyimpan..." : "Simpan Stok Masuk"}
           </Button>

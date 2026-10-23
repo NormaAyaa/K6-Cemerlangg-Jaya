@@ -8,6 +8,7 @@
   --color-background: var(--background);
   --color-foreground: var(--foreground);
   --font-sans: var(--font-inter);
+  --font-mono: var(--font-mono);
   --font-heading: var(--font-inter);
   --color-primary-strong: var(--primary-strong);
   --color-primary-soft: var(--primary-soft);
@@ -26,7 +27,7 @@
   --color-status-siap-diambil: var(--status-siap-diambil);
   --color-status-diambil: var(--status-diambil);
   --color-status-dibatalkan: var(--status-dibatalkan);
-  --shadow-card: 0 1px 4px rgba(16, 24, 40, 0.06);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -59,70 +60,68 @@
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
-  --radius-xl: 12px;
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-xl: 10px;
+  --radius-2xl: calc(var(--radius) * 1.6);
+  --radius-3xl: calc(var(--radius) * 2.0);
+  --radius-4xl: calc(var(--radius) * 2.4);
 }
 
 :root {
-  /* Token PRD Bab 13 / PRD Chapter 13 tokens */
-  --primary-strong: #1976D2;
-  --primary-soft: #DCEBFB;
-  --bg-app: #F2F9FE;
+  /* Tema Motorsport Technical: Sakura Pink & Carbon Black */
+  --primary: #FF2E75;
+  --primary-strong: #E11D5F;
+  --primary-soft: #FFF0F5;
+  --bg-app: #F8FAFC;
   --bg-panel: #FFFFFF;
-  --text: #212121;
-  --text-body: #4A5565;
-  --text-muted: #757575;
-  --success: #2E7D32;
+  --text: #09090B;
+  --text-body: #27272A;
+  --text-muted: #71717A;
+  --success: #10B981;
   --warning: #F59E0B;
-  --danger: #E53935;
+  --danger: #EF4444;
 
-  /* Warna status WO PRD 7.1, dipakai sama di badge, tab, dan grafik / WO status colors (PRD 7.1), shared by badges, tabs and charts */
-  --status-menunggu: #9E9E9E;
-  --status-dikerjakan: #2196F3;
+  /* Warna status WO PRD 7.1 dengan aksen motorsport */
+  --status-menunggu: #71717A;
+  --status-dikerjakan: #FF2E75;
   --status-tertunda: #F59E0B;
-  --status-selesai: #7E57C2;
-  --status-siap-diambil: #4CAF50;
-  --status-diambil: #2E7D32;
-  --status-dibatalkan: #E53935;
+  --status-selesai: #8B5CF6;
+  --status-siap-diambil: #10B981;
+  --status-diambil: #059669;
+  --status-dibatalkan: #EF4444;
 
-  /* Tema shadcn/ui dipetakan ke token di atas / shadcn/ui theme mapped onto the tokens above */
+  /* Tema shadcn/ui */
   --background: var(--bg-app);
   --foreground: var(--text);
   --card: var(--bg-panel);
   --card-foreground: var(--text);
   --popover: var(--bg-panel);
   --popover-foreground: var(--text);
-  --primary: #2196F3;
   --primary-foreground: #FFFFFF;
   --secondary: var(--primary-soft);
   --secondary-foreground: var(--primary-strong);
-  --muted: #F5F8FB;
+  --muted: #F4F4F5;
   --muted-foreground: var(--text-muted);
   --accent: var(--primary-soft);
   --accent-foreground: var(--primary-strong);
   --destructive: var(--danger);
-  --border: #EAF2FA;
-  /* Garis input sedikit lebih tegas agar kolom terlihat di atas putih / Input border slightly darker so fields stay visible on white */
-  --input: #D3E1EE;
-  --ring: #2196F3;
-  --chart-1: #2196F3;
-  --chart-2: #4CAF50;
+  --border: #E4E4E7;
+  --input: #D4D4D8;
+  --ring: #FF2E75;
+  --chart-1: #FF2E75;
+  --chart-2: #10B981;
   --chart-3: #F59E0B;
-  --chart-4: #7E57C2;
-  --chart-5: #E53935;
-  --radius: 10px;
-  --sidebar: var(--bg-app);
-  --sidebar-foreground: var(--text-body);
-  --sidebar-primary: #2196F3;
+  --chart-4: #8B5CF6;
+  --chart-5: #09090B;
+  --radius: 8px;
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #27272A;
+  --sidebar-primary: #FF2E75;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: var(--primary-soft);
-  --sidebar-accent-foreground: var(--primary-strong);
-  --sidebar-border: #EAF2FA;
-  --sidebar-ring: #2196F3;
+  --sidebar-accent: #FFF0F5;
+  --sidebar-accent-foreground: #E11D5F;
+  --sidebar-border: #E4E4E7;
+  --sidebar-ring: #FF2E75;
 }
-
 
 @layer base {
   * {
@@ -133,5 +132,30 @@
   }
   html {
     @apply font-sans;
+  }
+}
+
+@layer utilities {
+  .bg-grid-technical {
+    background-size: 28px 28px;
+    background-image: 
+      linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+  }
+
+  .bg-dots-technical {
+    background-size: 20px 20px;
+    background-image: radial-gradient(circle, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
+  }
+
+  .border-chamfer {
+    clip-path: polygon(
+      0 0,
+      calc(100% - 10px) 0,
+      100% 10px,
+      100% 100%,
+      10px 100%,
+      0 calc(100% - 10px)
+    );
   }
 }

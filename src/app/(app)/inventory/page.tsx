@@ -1,9 +1,6 @@
 import Link from "next/link";
 import { Search } from "lucide-react";
 import { Paginasi } from "@/components/Paginasi";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -90,28 +87,35 @@ export default async function HalamanInventory({
 
     return (
       <div className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-semibold text-text">Inventory</h1>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-zinc-800/80 pb-5">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+              Inventory
+            </h1>
+            <p className="mt-1 text-xs text-zinc-400">
+              Katalog spare part, tarif layanan jasa, dan riwayat mutasi stok bengkel
+            </p>
+          </div>
           {canManage && <FormItem jenis="part" isOwner={isOwner} />}
         </div>
 
         {/* Tab Navigasi */}
-        <div className="flex border-b border-border text-sm font-medium">
+        <div className="flex border-b border-zinc-800/80 text-sm font-medium gap-2">
           <Link
             href="/inventory?tab=part"
-            className="border-b-2 border-primary px-4 py-2.5 font-semibold text-primary"
+            className="border-b-2 border-primary px-4 py-2.5 font-semibold text-white transition-colors shadow-[0_1px_0_0_#FF2E75]"
           >
             Spare Part
           </Link>
           <Link
             href="/inventory?tab=jasa"
-            className="border-b-2 border-transparent px-4 py-2.5 text-text-muted hover:text-text"
+            className="border-b-2 border-transparent px-4 py-2.5 text-zinc-400 hover:text-white transition-colors"
           >
             Jasa
           </Link>
           <Link
             href="/inventory?tab=riwayat"
-            className="border-b-2 border-transparent px-4 py-2.5 text-text-muted hover:text-text"
+            className="border-b-2 border-transparent px-4 py-2.5 text-zinc-400 hover:text-white transition-colors"
           >
             Riwayat Stok
           </Link>
@@ -122,12 +126,12 @@ export default async function HalamanInventory({
           <form className="relative flex-1 sm:max-w-xs">
             <input type="hidden" name="tab" value="part" />
             {status && <input type="hidden" name="status" value={status} />}
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-muted" />
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-500" />
             <Input
               name="q"
               defaultValue={q}
               placeholder="Cari nama atau SKU..."
-              className="pl-9"
+              className="pl-9 text-xs border-zinc-800 bg-[#111116] text-white placeholder:text-zinc-500 focus-visible:border-primary/50"
             />
           </form>
 
@@ -148,10 +152,10 @@ export default async function HalamanInventory({
                 <Link
                   key={f.id}
                   href={`?${sp}`}
-                  className={`rounded-full px-3 py-1 font-medium transition-colors ${
+                  className={`rounded-full px-3.5 py-1 text-xs font-medium transition-colors ${
                     aktif
-                      ? "bg-primary text-white"
-                      : "bg-bg-app text-text-muted hover:bg-slate-200"
+                      ? "bg-primary text-white font-semibold shadow-[0_0_12px_rgba(255,46,117,0.35)]"
+                      : "border border-zinc-800 bg-[#111116] text-zinc-400 hover:text-white hover:bg-zinc-800/60"
                   }`}
                 >
                   {f.label}
@@ -162,26 +166,26 @@ export default async function HalamanInventory({
         </div>
 
         {/* Tabel Spare Part */}
-        <Card className="overflow-hidden">
+        <div className="rounded-xl border border-zinc-800/80 bg-[#111116] shadow-sm overflow-hidden">
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-24">SKU</TableHead>
-                <TableHead>Nama Spare Part</TableHead>
-                <TableHead className="text-right">Stok</TableHead>
-                <TableHead className="text-right">Min</TableHead>
-                <TableHead className="text-right">Harga Jual</TableHead>
-                {isOwner && <TableHead className="text-right">Harga Modal</TableHead>}
-                <TableHead className="text-center">Status</TableHead>
-                <TableHead className="text-right">Aksi</TableHead>
+            <TableHeader className="bg-zinc-900/60 border-b border-zinc-800/80">
+              <TableRow className="border-b border-zinc-800/80 hover:bg-transparent">
+                <TableHead className="w-24 text-zinc-400 font-semibold text-xs uppercase tracking-wider">SKU</TableHead>
+                <TableHead className="text-zinc-400 font-semibold text-xs uppercase tracking-wider">Nama Spare Part</TableHead>
+                <TableHead className="text-right text-zinc-400 font-semibold text-xs uppercase tracking-wider">Stok</TableHead>
+                <TableHead className="text-right text-zinc-400 font-semibold text-xs uppercase tracking-wider">Min</TableHead>
+                <TableHead className="text-right text-zinc-400 font-semibold text-xs uppercase tracking-wider">Harga Jual</TableHead>
+                {isOwner && <TableHead className="text-right text-zinc-400 font-semibold text-xs uppercase tracking-wider">Harga Modal</TableHead>}
+                <TableHead className="text-center text-zinc-400 font-semibold text-xs uppercase tracking-wider">Status</TableHead>
+                <TableHead className="text-right text-zinc-400 font-semibold text-xs uppercase tracking-wider">Aksi</TableHead>
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="divide-y divide-zinc-800/60">
               {filteredItems.length === 0 ? (
-                <TableRow>
+                <TableRow className="border-b border-zinc-800/60 hover:bg-transparent">
                   <TableCell
                     colSpan={isOwner ? 8 : 7}
-                    className="h-28 text-center text-text-muted"
+                    className="h-28 text-center text-xs text-zinc-500"
                   >
                     Tidak ada spare part yang sesuai.
                   </TableCell>
@@ -196,45 +200,45 @@ export default async function HalamanInventory({
                   }
 
                   let statusBadge = (
-                    <Badge variant="outline" className="border-emerald-600/30 bg-emerald-50 text-emerald-700">
+                    <span className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-950/40 px-2.5 py-0.5 text-[11px] font-medium text-emerald-400">
                       Aman
-                    </Badge>
+                    </span>
                   );
                   if (item.stok === 0) {
                     statusBadge = (
-                      <Badge variant="destructive" className="bg-rose-100 text-rose-700 hover:bg-rose-100">
+                      <span className="inline-flex items-center rounded-full border border-rose-500/30 bg-rose-950/40 px-2.5 py-0.5 text-[11px] font-medium text-rose-400">
                         Habis
-                      </Badge>
+                      </span>
                     );
                   } else if (item.stok <= item.stok_minimum) {
                     statusBadge = (
-                      <Badge variant="outline" className="border-amber-600/30 bg-amber-50 text-amber-700">
+                      <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-950/40 px-2.5 py-0.5 text-[11px] font-medium text-amber-400">
                         Menipis
-                      </Badge>
+                      </span>
                     );
                   }
 
                   return (
-                    <TableRow key={item.id}>
-                      <TableCell className="font-mono text-xs font-semibold text-text-muted">
+                    <TableRow key={item.id} className="border-b border-zinc-800/60 hover:bg-zinc-800/40 transition-colors">
+                      <TableCell className="font-mono text-xs font-semibold text-zinc-400">
                         {item.kode}
                       </TableCell>
-                      <TableCell className="font-medium text-text">{item.nama}</TableCell>
-                      <TableCell className="text-right tabular-nums font-semibold text-text">
+                      <TableCell className="font-medium text-white">{item.nama}</TableCell>
+                      <TableCell className="text-right tabular-nums font-bold text-white">
                         {item.stok}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums text-text-muted">
+                      <TableCell className="text-right tabular-nums text-zinc-500">
                         {item.stok_minimum}
                       </TableCell>
-                      <TableCell className="text-right tabular-nums font-medium text-text">
+                      <TableCell className="text-right tabular-nums font-semibold text-zinc-200">
                         {rupiah(item.harga_jual)}
                       </TableCell>
                       {isOwner && (
-                        <TableCell className="text-right tabular-nums text-text-muted">
+                        <TableCell className="text-right tabular-nums text-zinc-400">
                           {modal !== null ? (
                             rupiah(modal)
                           ) : (
-                            <span className="text-xs italic text-amber-600">Belum diisi</span>
+                            <span className="text-xs italic text-amber-400/90">Belum diisi</span>
                           )}
                         </TableCell>
                       )}
@@ -274,7 +278,7 @@ export default async function HalamanInventory({
               )}
             </TableBody>
           </Table>
-        </Card>
+        </div>
 
         <Paginasi
           halaman={halaman}
@@ -315,28 +319,35 @@ export default async function HalamanInventory({
 
     return (
       <div className="space-y-6">
-        <div className="flex flex-wrap items-center justify-between gap-3">
-          <h1 className="text-2xl font-semibold text-text">Inventory</h1>
+        <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-zinc-800/80 pb-5">
+          <div>
+            <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+              Inventory
+            </h1>
+            <p className="mt-1 text-xs text-zinc-400">
+              Katalog spare part, tarif layanan jasa, dan riwayat mutasi stok bengkel
+            </p>
+          </div>
           {canManage && <FormItem jenis="jasa" isOwner={isOwner} />}
         </div>
 
         {/* Tab Navigasi */}
-        <div className="flex border-b border-border text-sm font-medium">
+        <div className="flex border-b border-zinc-800/80 text-sm font-medium gap-2">
           <Link
             href="/inventory?tab=part"
-            className="border-b-2 border-transparent px-4 py-2.5 text-text-muted hover:text-text"
+            className="border-b-2 border-transparent px-4 py-2.5 text-zinc-400 hover:text-white transition-colors"
           >
             Spare Part
           </Link>
           <Link
             href="/inventory?tab=jasa"
-            className="border-b-2 border-primary px-4 py-2.5 font-semibold text-primary"
+            className="border-b-2 border-primary px-4 py-2.5 font-semibold text-white transition-colors shadow-[0_1px_0_0_#FF2E75]"
           >
             Jasa
           </Link>
           <Link
             href="/inventory?tab=riwayat"
-            className="border-b-2 border-transparent px-4 py-2.5 text-text-muted hover:text-text"
+            className="border-b-2 border-transparent px-4 py-2.5 text-zinc-400 hover:text-white transition-colors"
           >
             Riwayat Stok
           </Link>
@@ -346,42 +357,42 @@ export default async function HalamanInventory({
         <div className="flex flex-wrap items-center justify-between gap-3">
           <form className="relative flex-1 sm:max-w-xs">
             <input type="hidden" name="tab" value="jasa" />
-            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-muted" />
+            <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-500" />
             <Input
               name="q"
               defaultValue={q}
               placeholder="Cari kode atau nama jasa..."
-              className="pl-9"
+              className="pl-9 text-xs border-zinc-800 bg-[#111116] text-white placeholder:text-zinc-500 focus-visible:border-primary/50"
             />
           </form>
         </div>
 
         {/* Tabel Jasa */}
-        <Card className="overflow-hidden">
+        <div className="rounded-xl border border-zinc-800/80 bg-[#111116] shadow-sm overflow-hidden">
           <Table>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-28">Kode Jasa</TableHead>
-                <TableHead>Nama Layanan Jasa</TableHead>
-                <TableHead className="text-right">Tarif Jasa</TableHead>
-                {isOwner && <TableHead className="text-right">Aksi</TableHead>}
+            <TableHeader className="bg-zinc-900/60 border-b border-zinc-800/80">
+              <TableRow className="border-b border-zinc-800/80 hover:bg-transparent">
+                <TableHead className="w-28 text-zinc-400 font-semibold text-xs uppercase tracking-wider">Kode Jasa</TableHead>
+                <TableHead className="text-zinc-400 font-semibold text-xs uppercase tracking-wider">Nama Layanan Jasa</TableHead>
+                <TableHead className="text-right text-zinc-400 font-semibold text-xs uppercase tracking-wider">Tarif Jasa</TableHead>
+                {isOwner && <TableHead className="text-right text-zinc-400 font-semibold text-xs uppercase tracking-wider">Aksi</TableHead>}
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="divide-y divide-zinc-800/60">
               {items.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={isOwner ? 4 : 3} className="h-28 text-center text-text-muted">
+                <TableRow className="border-b border-zinc-800/60 hover:bg-transparent">
+                  <TableCell colSpan={isOwner ? 4 : 3} className="h-28 text-center text-xs text-zinc-500">
                     Tidak ada layanan jasa yang sesuai.
                   </TableCell>
                 </TableRow>
               ) : (
                 items.map((item) => (
-                  <TableRow key={item.id}>
-                    <TableCell className="font-mono text-xs font-semibold text-text-muted">
+                  <TableRow key={item.id} className="border-b border-zinc-800/60 hover:bg-zinc-800/40 transition-colors">
+                    <TableCell className="font-mono text-xs font-semibold text-zinc-400">
                       {item.kode}
                     </TableCell>
-                    <TableCell className="font-medium text-text">{item.nama}</TableCell>
-                    <TableCell className="text-right tabular-nums font-semibold text-text">
+                    <TableCell className="font-medium text-white">{item.nama}</TableCell>
+                    <TableCell className="text-right tabular-nums font-semibold text-zinc-200">
                       {rupiah(item.harga_jual)}
                     </TableCell>
                     {isOwner && (
@@ -404,7 +415,7 @@ export default async function HalamanInventory({
               )}
             </TableBody>
           </Table>
-        </Card>
+        </div>
 
         <Paginasi
           halaman={halaman}
@@ -444,108 +455,119 @@ export default async function HalamanInventory({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <h1 className="text-2xl font-semibold text-text">Inventory</h1>
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-zinc-800/80 pb-5">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            Inventory
+          </h1>
+          <p className="mt-1 text-xs text-zinc-400">
+            Katalog spare part, tarif layanan jasa, dan riwayat mutasi stok bengkel
+          </p>
+        </div>
       </div>
 
       {/* Tab Navigasi */}
-      <div className="flex border-b border-border text-sm font-medium">
+      <div className="flex border-b border-zinc-800/80 text-sm font-medium gap-2">
         <Link
           href="/inventory?tab=part"
-          className="border-b-2 border-transparent px-4 py-2.5 text-text-muted hover:text-text"
+          className="border-b-2 border-transparent px-4 py-2.5 text-zinc-400 hover:text-white transition-colors"
         >
           Spare Part
         </Link>
         <Link
           href="/inventory?tab=jasa"
-          className="border-b-2 border-transparent px-4 py-2.5 text-text-muted hover:text-text"
+          className="border-b-2 border-transparent px-4 py-2.5 text-zinc-400 hover:text-white transition-colors"
         >
           Jasa
         </Link>
         <Link
           href="/inventory?tab=riwayat"
-          className="border-b-2 border-primary px-4 py-2.5 font-semibold text-primary"
+          className="border-b-2 border-primary px-4 py-2.5 font-semibold text-white transition-colors shadow-[0_1px_0_0_#FF2E75]"
         >
           Riwayat Stok
         </Link>
       </div>
 
       {/* Tabel Riwayat Stok */}
-      <Card className="overflow-hidden">
+      <div className="rounded-xl border border-zinc-800/80 bg-[#111116] shadow-sm overflow-hidden">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-36">Waktu</TableHead>
-              <TableHead>Spare Part</TableHead>
-              <TableHead className="text-center">Jenis</TableHead>
-              <TableHead className="text-right">Perubahan</TableHead>
-              <TableHead className="text-right">Stok Akhir</TableHead>
-              <TableHead>Keterangan / Ref</TableHead>
-              <TableHead>Pencatat</TableHead>
+          <TableHeader className="bg-zinc-900/60 border-b border-zinc-800/80">
+            <TableRow className="border-b border-zinc-800/80 hover:bg-transparent">
+              <TableHead className="w-36 text-zinc-400 font-semibold text-xs uppercase tracking-wider">Waktu</TableHead>
+              <TableHead className="text-zinc-400 font-semibold text-xs uppercase tracking-wider">Spare Part</TableHead>
+              <TableHead className="text-center text-zinc-400 font-semibold text-xs uppercase tracking-wider">Jenis</TableHead>
+              <TableHead className="text-right text-zinc-400 font-semibold text-xs uppercase tracking-wider">Perubahan</TableHead>
+              <TableHead className="text-right text-zinc-400 font-semibold text-xs uppercase tracking-wider">Stok Akhir</TableHead>
+              <TableHead className="text-zinc-400 font-semibold text-xs uppercase tracking-wider">Keterangan / Ref</TableHead>
+              <TableHead className="text-zinc-400 font-semibold text-xs uppercase tracking-wider">Pencatat</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className="divide-y divide-zinc-800/60">
             {movements.length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={7} className="h-28 text-center text-text-muted">
+              <TableRow className="border-b border-zinc-800/60 hover:bg-transparent">
+                <TableCell colSpan={7} className="h-28 text-center text-xs text-zinc-500">
                   Belum ada pergerakan stok tercatat.
                 </TableCell>
               </TableRow>
             ) : (
               movements.map((m) => {
-                let badgeJenis = <Badge variant="outline">{m.jenis}</Badge>;
+                let badgeJenis = (
+                  <span className="inline-flex items-center rounded-full border border-zinc-700 bg-zinc-800 px-2.5 py-0.5 text-[10px] font-medium text-zinc-300">
+                    {m.jenis}
+                  </span>
+                );
                 if (m.jenis === "masuk") {
                   badgeJenis = (
-                    <Badge variant="outline" className="border-emerald-600/30 bg-emerald-50 text-emerald-700">
+                    <span className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-950/40 px-2.5 py-0.5 text-[10px] font-medium text-emerald-400">
                       Masuk
-                    </Badge>
+                    </span>
                   );
                 } else if (m.jenis === "keluar") {
                   badgeJenis = (
-                    <Badge variant="outline" className="border-rose-600/30 bg-rose-50 text-rose-700">
+                    <span className="inline-flex items-center rounded-full border border-rose-500/30 bg-rose-950/40 px-2.5 py-0.5 text-[10px] font-medium text-rose-400">
                       Keluar
-                    </Badge>
+                    </span>
                   );
                 } else if (m.jenis === "penyesuaian") {
                   badgeJenis = (
-                    <Badge variant="outline" className="border-amber-600/30 bg-amber-50 text-amber-700">
+                    <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-950/40 px-2.5 py-0.5 text-[10px] font-medium text-amber-400">
                       Penyesuaian
-                    </Badge>
+                    </span>
                   );
                 } else if (m.jenis === "kembali") {
                   badgeJenis = (
-                    <Badge variant="outline" className="border-blue-600/30 bg-blue-50 text-blue-700">
+                    <span className="inline-flex items-center rounded-full border border-blue-500/30 bg-blue-950/40 px-2.5 py-0.5 text-[10px] font-medium text-blue-400">
                       Kembali
-                    </Badge>
+                    </span>
                   );
                 }
 
                 return (
-                  <TableRow key={m.id}>
-                    <TableCell className="text-xs text-text-muted">
+                  <TableRow key={m.id} className="border-b border-zinc-800/60 hover:bg-zinc-800/40 transition-colors">
+                    <TableCell className="text-xs text-zinc-400">
                       {tanggal(m.created_at)}
                     </TableCell>
                     <TableCell>
-                      <span className="font-medium text-text">
+                      <span className="font-medium text-white">
                         {m.inventory_items?.nama ?? "-"}
                       </span>
-                      <span className="ml-2 font-mono text-xs text-text-muted">
+                      <span className="ml-2 font-mono text-xs text-zinc-500">
                         ({m.inventory_items?.kode ?? "-"})
                       </span>
                     </TableCell>
                     <TableCell className="text-center">{badgeJenis}</TableCell>
                     <TableCell className="text-right tabular-nums font-semibold">
-                      <span className={m.jumlah > 0 ? "text-emerald-700" : "text-rose-700"}>
+                      <span className={m.jumlah > 0 ? "text-emerald-400" : "text-rose-400"}>
                         {m.jumlah > 0 ? `+${m.jumlah}` : m.jumlah}
                       </span>
                     </TableCell>
-                    <TableCell className="text-right tabular-nums font-medium text-text">
+                    <TableCell className="text-right tabular-nums font-bold text-white">
                       {m.stok_sesudah}
                     </TableCell>
-                    <TableCell className="text-sm text-text-muted">
+                    <TableCell className="text-xs text-zinc-400">
                       {m.keterangan || (m.work_orders?.nomor ? `WO: ${m.work_orders.nomor}` : "-")}
                     </TableCell>
-                    <TableCell className="text-sm text-text-muted">
+                    <TableCell className="text-xs text-zinc-400">
                       {m.profiles?.nama ?? "-"}
                     </TableCell>
                   </TableRow>
@@ -554,7 +576,7 @@ export default async function HalamanInventory({
             )}
           </TableBody>
         </Table>
-      </Card>
+      </div>
 
       <Paginasi
         halaman={halaman}

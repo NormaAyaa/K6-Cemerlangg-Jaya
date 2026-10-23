@@ -87,15 +87,17 @@ export function FormItem({
         return;
       }
 
-      // Jika Owner mengisi harga modal
+      // Khusus Owner: perbarui harga modal jika jenis part
       if (isOwner && jenis === "part" && data.harga_modal !== undefined && data.harga_modal !== null) {
-        const { error: errCost } = await supabase
+        const { error: errModal } = await supabase
           .from("inventory_costs")
-          .upsert({ item_id: item.id, harga_modal: data.harga_modal });
+          .upsert({
+            item_id: item.id,
+            harga_modal: data.harga_modal,
+          });
 
-        if (errCost) {
-          toast.error("Item diperbarui, tapi gagal menyimpan harga modal");
-          return;
+        if (errModal) {
+          toast.error("Data tersimpan tetapi gagal memperbarui harga modal");
         }
       }
 
@@ -110,28 +112,36 @@ export function FormItem({
         ...(jenis === "part" ? { stok_minimum: data.stok_minimum ?? 5 } : {}),
       };
 
-      const { data: created, error: errInsert } = await supabase
+      const { data: itemBaru, error: errInsert } = await supabase
         .from("inventory_items")
         .insert(insertData)
         .select("id")
         .single();
 
-      if (errInsert) {
-        if (errInsert.code === "23505") {
+      if (errInsert || !itemBaru) {
+        if (errInsert?.code === "23505") {
           form.setError("kode", { message: "Kode/SKU ini sudah digunakan" });
         } else {
-          toast.error(errInsert.message || "Gagal menambahkan item");
+          toast.error(errInsert?.message || "Gagal menambahkan item");
         }
         return;
       }
 
-      if (isOwner && jenis === "part" && created && data.harga_modal !== undefined && data.harga_modal !== null) {
-        await supabase
+      // Khusus Owner: simpan harga modal jika jenis part
+      if (isOwner && jenis === "part" && data.harga_modal !== undefined && data.harga_modal !== null) {
+        const { error: errModal } = await supabase
           .from("inventory_costs")
-          .insert({ item_id: created.id, harga_modal: data.harga_modal });
+          .insert({
+            item_id: itemBaru.id,
+            harga_modal: data.harga_modal,
+          });
+
+        if (errModal) {
+          toast.error("Item berhasil dibuat tetapi harga modal gagal disimpan");
+        }
       }
 
-      toast.success(`${jenis === "part" ? "Spare part" : "Jasa"} baru ditambahkan`);
+      toast.success(`${jenis === "part" ? "Spare part" : "Jasa"} berhasil ditambahkan`);
     }
 
     setBuka(false);
@@ -153,30 +163,53 @@ export function FormItem({
     >
       <DialogTrigger asChild>
         {item ? (
-          <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 gap-1.5 text-xs border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:bg-zinc-800 hover:text-white hover:border-primary/40"
+          >
             <Pencil className="size-3.5" />
             Ubah
           </Button>
         ) : (
-          <Button className="gap-2">
+          <Button className="gap-2 bg-primary hover:bg-primary-strong text-white font-medium text-xs shadow-xs">
             <Plus className="size-4" />
             {jenis === "part" ? "Spare Part" : "Jasa"}
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="bg-[#111116] border border-zinc-800 text-white sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{judul}</DialogTitle>
+          <DialogTitle className="text-white text-base font-semibold">
+            {judul}
+          </DialogTitle>
         </DialogHeader>
-        <form id={`form-item-${item?.id ?? "baru"}`} onSubmit={form.handleSubmit(simpan)} noValidate>
+        <form
+          id={`form-item-${item?.id ?? "baru"}`}
+          onSubmit={form.handleSubmit(simpan)}
+          noValidate
+        >
           <FieldGroup className="gap-4">
             <Controller
               name="nama"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="nama-item">Nama {jenis === "part" ? "Spare Part" : "Jasa"} *</FieldLabel>
-                  <Input {...field} id="nama-item" placeholder={jenis === "part" ? "Contoh: Filter Udara" : "Contoh: Tune-up"} aria-invalid={fieldState.invalid} />
+                  <FieldLabel
+                    htmlFor="nama-item"
+                    className="text-zinc-300 text-xs font-medium"
+                  >
+                    Nama {jenis === "part" ? "Spare Part" : "Jasa"} *
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="nama-item"
+                    placeholder={
+                      jenis === "part" ? "Contoh: Filter Udara" : "Contoh: Tune-up"
+                    }
+                    aria-invalid={fieldState.invalid}
+                    className="border-zinc-800 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:border-primary/50 text-xs"
+                  />
                   <FieldError errors={[fieldState.error]} />
                 </Field>
               )}
@@ -188,8 +221,19 @@ export function FormItem({
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="kode-item">Kode / SKU (Opsional - otomatis dibuat bila kosong)</FieldLabel>
-                    <Input {...field} id="kode-item" placeholder={jenis === "part" ? "SP-0011" : "JS-0007"} aria-invalid={fieldState.invalid} />
+                    <FieldLabel
+                      htmlFor="kode-item"
+                      className="text-zinc-300 text-xs font-medium"
+                    >
+                      Kode / SKU (Opsional - otomatis dibuat bila kosong)
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id="kode-item"
+                      placeholder={jenis === "part" ? "SP-0011" : "JS-0007"}
+                      aria-invalid={fieldState.invalid}
+                      className="border-zinc-800 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:border-primary/50 text-xs"
+                    />
                     <FieldError errors={[fieldState.error]} />
                   </Field>
                 )}
@@ -201,40 +245,61 @@ export function FormItem({
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="harga-jual">Harga Jual / Tarif (Rp) *</FieldLabel>
+                  <FieldLabel
+                    htmlFor="harga-jual-item"
+                    className="text-zinc-300 text-xs font-medium"
+                  >
+                    Harga Jual (Rp) *
+                  </FieldLabel>
                   <Input
-                    id="harga-jual"
+                    id="harga-jual-item"
                     type="number"
                     min={0}
                     value={field.value ?? 0}
-                    onChange={(e) => field.onChange(e.target.value === "" ? 0 : Number(e.target.value))}
+                    onChange={(e) =>
+                      field.onChange(
+                        e.target.value === "" ? 0 : Number(e.target.value)
+                      )
+                    }
                     onBlur={field.onBlur}
                     name={field.name}
                     ref={field.ref}
                     aria-invalid={fieldState.invalid}
+                    className="border-zinc-800 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:border-primary/50 text-xs"
                   />
                   <FieldError errors={[fieldState.error]} />
                 </Field>
               )}
             />
 
-            {jenis === "part" && (
+            {isOwner && jenis === "part" && (
               <Controller
-                name="stok_minimum"
+                name="harga_modal"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="stok-min">Stok Minimum (Peringatan)</FieldLabel>
+                    <FieldLabel
+                      htmlFor="harga-modal-item"
+                      className="text-zinc-300 text-xs font-medium"
+                    >
+                      Harga Modal (Rp) - Khusus Owner
+                    </FieldLabel>
                     <Input
-                      id="stok-min"
+                      id="harga-modal-item"
                       type="number"
                       min={0}
-                      value={field.value ?? 5}
-                      onChange={(e) => field.onChange(e.target.value === "" ? 0 : Number(e.target.value))}
+                      value={field.value ?? ""}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value === "" ? null : Number(e.target.value)
+                        )
+                      }
                       onBlur={field.onBlur}
                       name={field.name}
                       ref={field.ref}
+                      placeholder="0"
                       aria-invalid={fieldState.invalid}
+                      className="border-zinc-800 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:border-primary/50 text-xs"
                     />
                     <FieldError errors={[fieldState.error]} />
                   </Field>
@@ -242,24 +307,33 @@ export function FormItem({
               />
             )}
 
-            {jenis === "part" && isOwner && (
+            {jenis === "part" && (
               <Controller
-                name="harga_modal"
+                name="stok_minimum"
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="harga-modal">Harga Modal (Rp) - Khusus Owner</FieldLabel>
+                    <FieldLabel
+                      htmlFor="stok-minimum-item"
+                      className="text-zinc-300 text-xs font-medium"
+                    >
+                      Batas Stok Minimum (Peringatan Menipis)
+                    </FieldLabel>
                     <Input
-                      id="harga-modal"
+                      id="stok-minimum-item"
                       type="number"
                       min={0}
-                      placeholder="Masukkan harga modal pengadaan"
-                      value={field.value ?? ""}
-                      onChange={(e) => field.onChange(e.target.value === "" ? null : Number(e.target.value))}
+                      value={field.value ?? 5}
+                      onChange={(e) =>
+                        field.onChange(
+                          e.target.value === "" ? 0 : Number(e.target.value)
+                        )
+                      }
                       onBlur={field.onBlur}
                       name={field.name}
                       ref={field.ref}
                       aria-invalid={fieldState.invalid}
+                      className="border-zinc-800 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:border-primary/50 text-xs"
                     />
                     <FieldError errors={[fieldState.error]} />
                   </Field>
@@ -268,13 +342,14 @@ export function FormItem({
             )}
           </FieldGroup>
         </form>
-        <DialogFooter>
+        <DialogFooter className="gap-2 sm:gap-0">
           <Button
             type="submit"
             form={`form-item-${item?.id ?? "baru"}`}
             disabled={form.formState.isSubmitting}
+            className="bg-primary hover:bg-primary-strong text-white font-medium text-xs shadow-xs"
           >
-            {form.formState.isSubmitting ? "Menyimpan..." : "Simpan"}
+            {form.formState.isSubmitting ? "Menyimpan..." : "Simpan Data"}
           </Button>
         </DialogFooter>
       </DialogContent>

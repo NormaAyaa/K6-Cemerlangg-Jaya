@@ -59,11 +59,16 @@ export default async function HalamanSetelan() {
 
   return (
     <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold text-text">Setelan Bengkel</h1>
-        <p className="text-sm text-text-muted">
-          Atur identitas bengkel, logo usaha, dan foto galeri publik.
-        </p>
+      {/* Header Halaman */}
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-zinc-800/80 pb-5">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            Setelan Bengkel
+          </h1>
+          <p className="mt-1 text-xs text-zinc-400">
+            Atur identitas bengkel, logo usaha, foto galeri publik, dan integrasi payment gateway
+          </p>
+        </div>
       </div>
 
       <FormSetelan setelan={dataBengkel} />
@@ -81,4 +86,3 @@ export default async function HalamanSetelan() {
     </div>
   );
 }
-

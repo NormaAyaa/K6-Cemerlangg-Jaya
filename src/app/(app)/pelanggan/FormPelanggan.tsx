@@ -83,20 +83,26 @@ export function FormPelanggan({ pelanggan }: { pelanggan?: Pelanggan }) {
     >
       <DialogTrigger asChild>
         {pelanggan ? (
-          <Button variant="outline" size="sm">
-            <Pencil />
+          <Button
+            variant="outline"
+            size="sm"
+            className="h-8 gap-1.5 text-xs border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:bg-zinc-800 hover:text-white hover:border-primary/40"
+          >
+            <Pencil className="size-3.5" />
             Ubah
           </Button>
         ) : (
-          <Button>
-            <Plus />
-            Pelanggan
+          <Button className="gap-2 bg-primary hover:bg-primary-strong text-white font-medium text-xs shadow-xs">
+            <Plus className="size-4" />
+            Pelanggan Baru
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="bg-[#111116] border border-zinc-800 text-white sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{pelanggan ? "Ubah Pelanggan" : "Tambah Pelanggan"}</DialogTitle>
+          <DialogTitle className="text-white text-base font-semibold">
+            {pelanggan ? "Ubah Data Pelanggan" : "Tambah Pelanggan Baru"}
+          </DialogTitle>
         </DialogHeader>
         <form id="form-pelanggan" onSubmit={form.handleSubmit(simpan)} noValidate>
           <FieldGroup className="gap-4">
@@ -105,14 +111,16 @@ export function FormPelanggan({ pelanggan }: { pelanggan?: Pelanggan }) {
               control={form.control}
               render={({ field }) => (
                 <Field>
-                  <FieldLabel htmlFor="tipe">Tipe</FieldLabel>
+                  <FieldLabel htmlFor="tipe" className="text-zinc-300 text-xs font-medium">
+                    Tipe Pelanggan *
+                  </FieldLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger id="tipe" className="w-full">
+                    <SelectTrigger id="tipe" className="w-full border-zinc-800 bg-zinc-900 text-white text-xs">
                       <SelectValue />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="perorangan">Perorangan</SelectItem>
-                      <SelectItem value="perusahaan">Perusahaan</SelectItem>
+                    <SelectContent className="border-zinc-800 bg-[#111116] text-white">
+                      <SelectItem value="perorangan" className="text-xs focus:bg-zinc-800 focus:text-white">Perorangan</SelectItem>
+                      <SelectItem value="perusahaan" className="text-xs focus:bg-zinc-800 focus:text-white">Perusahaan</SelectItem>
                     </SelectContent>
                   </Select>
                 </Field>
@@ -123,8 +131,16 @@ export function FormPelanggan({ pelanggan }: { pelanggan?: Pelanggan }) {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="nama">Nama *</FieldLabel>
-                  <Input {...field} id="nama" aria-invalid={fieldState.invalid} />
+                  <FieldLabel htmlFor="nama" className="text-zinc-300 text-xs font-medium">
+                    Nama Pelanggan *
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="nama"
+                    placeholder="Contoh: Budi Santoso / PT Maju Jaya"
+                    aria-invalid={fieldState.invalid}
+                    className="border-zinc-800 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:border-primary/50 text-xs"
+                  />
                   <FieldError errors={[fieldState.error]} />
                 </Field>
               )}
@@ -134,8 +150,17 @@ export function FormPelanggan({ pelanggan }: { pelanggan?: Pelanggan }) {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="telepon">Telepon *</FieldLabel>
-                  <Input {...field} id="telepon" inputMode="numeric" placeholder="081234567890" aria-invalid={fieldState.invalid} />
+                  <FieldLabel htmlFor="telepon" className="text-zinc-300 text-xs font-medium">
+                    Nomor Telepon *
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="telepon"
+                    inputMode="numeric"
+                    placeholder="081234567890"
+                    aria-invalid={fieldState.invalid}
+                    className="border-zinc-800 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:border-primary/50 text-xs font-mono"
+                  />
                   <FieldError errors={[fieldState.error]} />
                 </Field>
               )}
@@ -145,8 +170,17 @@ export function FormPelanggan({ pelanggan }: { pelanggan?: Pelanggan }) {
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="email">Email</FieldLabel>
-                  <Input {...field} id="email" type="email" aria-invalid={fieldState.invalid} />
+                  <FieldLabel htmlFor="email" className="text-zinc-300 text-xs font-medium">
+                    Alamat Email (Opsional)
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="email"
+                    type="email"
+                    placeholder="pelanggan@email.com"
+                    aria-invalid={fieldState.invalid}
+                    className="border-zinc-800 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:border-primary/50 text-xs"
+                  />
                   <FieldError errors={[fieldState.error]} />
                 </Field>
               )}
@@ -156,16 +190,29 @@ export function FormPelanggan({ pelanggan }: { pelanggan?: Pelanggan }) {
               control={form.control}
               render={({ field }) => (
                 <Field>
-                  <FieldLabel htmlFor="alamat">Alamat</FieldLabel>
-                  <Textarea {...field} id="alamat" rows={2} />
+                  <FieldLabel htmlFor="alamat" className="text-zinc-300 text-xs font-medium">
+                    Alamat Domisili
+                  </FieldLabel>
+                  <Textarea
+                    {...field}
+                    id="alamat"
+                    rows={2}
+                    placeholder="Jalan, nomor, kelurahan, kota..."
+                    className="border-zinc-800 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:border-primary/50 text-xs resize-none"
+                  />
                 </Field>
               )}
             />
           </FieldGroup>
         </form>
-        <DialogFooter>
-          <Button type="submit" form="form-pelanggan" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? "Menyimpan..." : "Simpan"}
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button
+            type="submit"
+            form="form-pelanggan"
+            disabled={form.formState.isSubmitting}
+            className="bg-primary hover:bg-primary-strong text-white font-medium text-xs shadow-xs"
+          >
+            {form.formState.isSubmitting ? "Menyimpan..." : "Simpan Data"}
           </Button>
         </DialogFooter>
       </DialogContent>

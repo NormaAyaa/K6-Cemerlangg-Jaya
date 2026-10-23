@@ -13,20 +13,20 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     .eq("id", 1)
     .maybeSingle();
 
-  // Bucket publik dibuat di Fitur C; sebelum itu logo_path masih kosong / The public bucket arrives with Feature C; until then logo_path is empty
+  // Gunakan logo_path bila ada di bucket, atau fallback ke logo bengkel di /logo.png
   const logoUrl = bengkel?.logo_path
     ? supabase.storage.from("publik").getPublicUrl(bengkel.logo_path).data.publicUrl
-    : null;
+    : "/logo.png?v=2";
 
   return (
-    <div className="min-h-dvh md:grid md:grid-cols-[16rem_minmax(0,1fr)]">
+    <div className="min-h-dvh flex flex-col md:flex-row bg-[#09090d] text-zinc-100">
       <Sidebar
         namaBengkel={bengkel?.nama ?? "Cemerlang Jaya Motor"}
         logoUrl={logoUrl}
         nama={profil.nama}
         peran={profil.peran}
       />
-      <main className="p-4 md:p-8">{children}</main>
+      <main className="flex-1 min-w-0 p-4 md:p-8">{children}</main>
       <Suspense>
         <PesanDariUrl />
       </Suspense>

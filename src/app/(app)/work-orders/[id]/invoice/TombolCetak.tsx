@@ -98,56 +98,52 @@ export function TombolCetak({
       }
 
       try {
-        const { data, error } = await supabase
+        const { data: inv } = await supabase
           .from("invoices")
           .select("status_bayar, dibayar_online_at")
           .eq("id", invoiceId)
-          .maybeSingle();
+          .single();
 
-        if (error) {
-          console.error("Gagal memeriksa status invoice:", error);
-          return;
-        }
-
-        if (data && data.status_bayar === "lunas") {
-          hentikanPolling();
+        if (inv && inv.status_bayar === "lunas") {
           setStatusBayar("lunas");
-          const waktuLunas = data.dibayar_online_at || new Date().toISOString();
-          setDibayarOnlineAt(waktuLunas);
-          toast.success("Pembayaran berhasil diverifikasi! Invoice telah Lunas.");
+          setDibayarOnlineAt(inv.dibayar_online_at);
+          hentikanPolling();
+          toast.success("Pembayaran online berhasil dikonfirmasi! Invoice telah lunas.");
           router.refresh();
         }
-      } catch (err) {
-        console.error("Kesalahan saat polling status invoice:", err);
+      } catch {
+        // Abaikan error jaringan sementara pada background polling
       }
     }, 5000);
   }
 
   async function handleBayarOnline() {
-    setLoading(true);
     setErrorPesan(null);
+    setLoading(true);
 
     try {
-      const res = await fetch("/api/pembayaran/buat", {
+      // Buka window kosong duluan agar tidak diblokir pop-up blocker browser
+      const tabBaru = window.open("about:blank", "_blank");
+
+      const res = await fetch(`/api/invoices/${invoiceId}/mayar`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id: invoiceId }),
       });
 
-      const data = await res.json();
+      const json = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Gagal membuat tautan pembayaran Mayar");
+        if (tabBaru) tabBaru.close();
+        throw new Error(json.error || "Gagal membuat tautan pembayaran Mayar");
       }
 
-      if (!data.link) {
-        throw new Error("Tautan pembayaran tidak diterima dari server Mayar");
+      const linkMayar = json.link;
+      setTautanMayar(linkMayar);
+
+      // Arahkan tab kosong ke URL Mayar
+      if (tabBaru) {
+        tabBaru.location.href = linkMayar;
       }
 
-      setTautanMayar(data.link);
-
-      // Buka tautan Mayar di tab baru
-      const tabBaru = window.open(data.link, "_blank", "noopener,noreferrer");
       if (!tabBaru) {
         toast.warning(
           "Popup tab baru diblokir oleh browser. Silakan klik tombol 'Buka Tautan Mayar' di bawah.",
@@ -176,9 +172,13 @@ export function TombolCetak({
     <div className="space-y-4 print:hidden mb-6">
       {/* Baris Tombol Aksi */}
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <Button asChild variant="outline" className="gap-2">
+        <Button
+          asChild
+          variant="outline"
+          className="gap-1.5 border-zinc-800 bg-zinc-900/70 hover:bg-zinc-800 text-zinc-200 hover:text-white font-mono text-xs"
+        >
           <Link href={`/work-orders/${woId}/tagihan`}>
-            <ArrowLeft className="size-4" />
+            <ArrowLeft className="size-3.5 text-[#FF2E75]" />
             Kembali ke Tagihan
           </Link>
         </Button>
@@ -189,20 +189,20 @@ export function TombolCetak({
               type="button"
               onClick={handleBayarOnline}
               disabled={loading || isPolling}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white gap-2 shadow-xs"
+              className="bg-emerald-600 hover:bg-emerald-500 text-white gap-2 font-mono text-xs shadow-md shadow-emerald-950/30"
             >
               {loading ? (
                 <Loader2 className="size-4 animate-spin" />
               ) : (
                 <CreditCard className="size-4" />
               )}
-              {loading ? "Menyiapkan Mayar..." : "Bayar Online"}
+              {loading ? "Menyiapkan Mayar..." : "Bayar Online (Mayar)"}
             </Button>
           )}
 
           <Button
             onClick={() => window.print()}
-            className="bg-primary hover:bg-primary-strong text-white gap-2 shadow-xs"
+            className="bg-primary hover:bg-primary-strong text-white gap-2 font-mono text-xs shadow-md shadow-pink-950/30"
           >
             <Printer className="size-4" />
             Cetak Invoice / Simpan PDF
@@ -212,19 +212,19 @@ export function TombolCetak({
 
       {/* Banner Error jika pembuatan tautan gagal */}
       {errorPesan && (
-        <div className="flex items-start justify-between gap-3 p-3.5 rounded-lg border border-rose-200 bg-rose-50 text-rose-800 text-xs">
+        <div className="flex items-start justify-between gap-3 p-3.5 rounded-lg border border-rose-500/20 bg-rose-500/10 text-rose-300 text-xs font-mono">
           <div className="flex items-start gap-2">
-            <AlertCircle className="size-4 shrink-0 text-rose-600 mt-0.5" />
+            <AlertCircle className="size-4 shrink-0 text-rose-400 mt-0.5" />
             <div>
-              <p className="font-semibold">Gagal Memproses Pembayaran Online</p>
-              <p className="mt-0.5">{errorPesan}</p>
+              <p className="font-semibold text-rose-300">Gagal Memproses Pembayaran Online</p>
+              <p className="mt-0.5 text-zinc-300">{errorPesan}</p>
             </div>
           </div>
           <Button
             size="sm"
             variant="ghost"
             onClick={() => setErrorPesan(null)}
-            className="h-6 px-2 text-rose-700 hover:text-rose-900 text-xs"
+            className="h-6 px-2 text-rose-400 hover:text-rose-300 hover:bg-rose-500/10 text-xs"
           >
             Tutup
           </Button>
@@ -233,19 +233,19 @@ export function TombolCetak({
 
       {/* Banner Polling Aktif (setiap 5 detik selama 5 menit) */}
       {isPolling && (
-        <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-lg border border-sky-200 bg-sky-50 text-sky-900 text-xs shadow-xs animate-in fade-in">
+        <div className="flex flex-wrap items-center justify-between gap-3 p-3.5 rounded-lg border border-sky-500/20 bg-sky-500/10 text-sky-300 text-xs font-mono shadow-xs animate-in fade-in">
           <div className="flex items-center gap-2.5">
-            <Loader2 className="size-4 animate-spin text-sky-600 shrink-0" />
+            <Loader2 className="size-4 animate-spin text-sky-400 shrink-0" />
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-sm text-sky-950">
+                <span className="font-semibold text-sm text-sky-200">
                   Memeriksa Status Pembayaran Online
                 </span>
-                <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-sky-200/70 text-sky-800">
+                <span className="font-mono text-xs font-semibold px-2 py-0.5 rounded bg-sky-500/20 text-sky-300 border border-sky-500/30">
                   {sisaWaktuFormatted}
                 </span>
               </div>
-              <p className="text-sky-700 mt-0.5">
+              <p className="text-zinc-400 mt-0.5 text-[11px]">
                 Sistem memeriksa status invoice setiap 5 detik secara otomatis selama 5 menit.
               </p>
             </div>
@@ -253,9 +253,9 @@ export function TombolCetak({
 
           <div className="flex items-center gap-2">
             {tautanMayar && (
-              <Button asChild size="sm" variant="outline" className="h-7 text-xs gap-1.5 bg-white">
+              <Button asChild size="sm" variant="outline" className="h-7 text-xs gap-1.5 border-zinc-800 bg-zinc-900 text-zinc-200 hover:bg-zinc-800">
                 <a href={tautanMayar} target="_blank" rel="noopener noreferrer">
-                  <ExternalLink className="size-3.5" />
+                  <ExternalLink className="size-3.5 text-[#FF2E75]" />
                   Buka Tautan Mayar
                 </a>
               </Button>
@@ -264,7 +264,7 @@ export function TombolCetak({
               size="sm"
               variant="ghost"
               onClick={() => hentikanPolling("Pemeriksaan otomatis dihentikan")}
-              className="h-7 text-xs gap-1 text-sky-800 hover:bg-sky-100"
+              className="h-7 text-xs gap-1 text-sky-400 hover:bg-sky-500/20"
             >
               <StopCircle className="size-3.5" />
               Hentikan
@@ -275,21 +275,21 @@ export function TombolCetak({
 
       {/* Banner Status Lunas setelah pembayaran online terkonfirmasi */}
       {statusBayar === "lunas" && (
-        <div className="flex items-center justify-between gap-3 p-3.5 rounded-lg border border-emerald-200 bg-emerald-50 text-emerald-900 text-xs shadow-xs">
+        <div className="flex items-center justify-between gap-3 p-3.5 rounded-lg border border-emerald-500/20 bg-emerald-500/10 text-emerald-300 text-xs font-mono shadow-xs">
           <div className="flex items-center gap-2.5">
-            <CheckCircle2 className="size-5 text-emerald-600 shrink-0" />
+            <CheckCircle2 className="size-5 text-emerald-400 shrink-0" />
             <div>
               <div className="flex items-center gap-2">
-                <span className="font-semibold text-sm text-emerald-950">
+                <span className="font-semibold text-sm text-white">
                   Status Invoice:
                 </span>
-                <span className="px-2 py-0.5 rounded text-[11px] font-bold bg-emerald-600 text-white uppercase tracking-wider">
+                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 uppercase tracking-wider font-mono">
                   LUNAS
                 </span>
               </div>
-              <p className="text-emerald-700 mt-0.5">
+              <p className="text-zinc-400 mt-0.5 text-[11px]">
                 Waktu dibayar:{" "}
-                <span className="font-medium text-emerald-900">
+                <span className="font-medium text-emerald-400">
                   {tanggalWaktu(dibayarOnlineAt)}
                 </span>
               </p>

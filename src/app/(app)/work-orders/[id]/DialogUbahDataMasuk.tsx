@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Pencil, Stethoscope, Users, Loader2 } from "lucide-react";
+import { Pencil, Stethoscope, Loader2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
@@ -88,6 +88,7 @@ export function DialogUbahDataMasuk({
       toast.success("Data masuk Work Order berhasil diperbarui");
       setBukaDataMasuk(false);
       router.refresh();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err?.message || "Gagal memperbarui data masuk");
     } finally {
@@ -110,6 +111,7 @@ export function DialogUbahDataMasuk({
       toast.success("Diagnosis pengerjaan berhasil disimpan");
       setBukaDiagnosis(false);
       router.refresh();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err?.message || "Gagal menyimpan diagnosis");
     } finally {
@@ -123,35 +125,45 @@ export function DialogUbahDataMasuk({
       {bolehUbahDataMasuk && (
         <Dialog open={bukaDataMasuk} onOpenChange={setBukaDataMasuk}>
           <DialogTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Pencil className="size-3.5" />
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-zinc-800 bg-zinc-900/70 hover:bg-zinc-800 text-zinc-200 hover:text-white text-xs gap-1.5"
+            >
+              <Pencil className="size-3.5 text-[#FF2E75]" />
               Ubah Data Masuk
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="bg-[#111116] border-zinc-800 text-zinc-100 sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Ubah Data Masuk Work Order</DialogTitle>
+              <DialogTitle className="text-white font-semibold font-mono text-base">
+                Ubah Data Masuk Work Order
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-4 py-2">
-              <div>
-                <Label htmlFor="odo-edit">Odometer (KM) *</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="odo-edit" className="text-xs font-semibold text-zinc-300 font-mono uppercase tracking-wider">
+                  Odometer (KM) *
+                </Label>
                 <Input
                   id="odo-edit"
                   type="number"
                   min="0"
                   value={odometer}
                   onChange={(e) => setOdometer(Number(e.target.value))}
-                  className="mt-1 font-medium"
+                  className="bg-zinc-900/80 border-zinc-800 text-white font-mono focus-visible:border-[#FF2E75]"
                 />
               </div>
 
-              <div>
-                <Label htmlFor="tim-edit">Tim Kepala Mekanik *</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="tim-edit" className="text-xs font-semibold text-zinc-300 font-mono uppercase tracking-wider">
+                  Tim Kepala Mekanik *
+                </Label>
                 <select
                   id="tim-edit"
                   value={timId}
                   onChange={(e) => setTimId(e.target.value)}
-                  className="mt-1 w-full h-9 rounded-md border border-input bg-card px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+                  className="w-full h-9 rounded-md border border-zinc-800 bg-zinc-900/80 px-3 py-1 text-xs text-zinc-200 shadow-xs focus:border-[#FF2E75] focus:outline-none"
                 >
                   {daftarKepalaMekanik.map((km) => (
                     <option key={km.id} value={km.id}>
@@ -161,22 +173,32 @@ export function DialogUbahDataMasuk({
                 </select>
               </div>
 
-              <div>
-                <Label htmlFor="keluhan-edit">Keluhan *</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="keluhan-edit" className="text-xs font-semibold text-zinc-300 font-mono uppercase tracking-wider">
+                  Keluhan *
+                </Label>
                 <Textarea
                   id="keluhan-edit"
                   value={keluhan}
                   onChange={(e) => setKeluhan(e.target.value)}
                   rows={3}
-                  className="mt-1"
+                  className="bg-zinc-900/80 border-zinc-800 text-white placeholder:text-zinc-600 focus-visible:border-[#FF2E75]"
                 />
               </div>
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setBukaDataMasuk(false)}>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                variant="outline"
+                onClick={() => setBukaDataMasuk(false)}
+                className="border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300"
+              >
                 Batal
               </Button>
-              <Button onClick={simpanDataMasuk} disabled={loading}>
+              <Button
+                onClick={simpanDataMasuk}
+                disabled={loading}
+                className="bg-primary hover:bg-primary-strong text-white font-medium shadow-md shadow-pink-950/30"
+              >
                 {loading ? <Loader2 className="size-4 animate-spin mr-1.5" /> : null}
                 Simpan Perubahan
               </Button>
@@ -189,30 +211,47 @@ export function DialogUbahDataMasuk({
       {bolehUbahDiagnosis && (
         <Dialog open={bukaDiagnosis} onOpenChange={setBukaDiagnosis}>
           <DialogTrigger asChild>
-            <Button variant="outline" size="sm">
-              <Stethoscope className="size-3.5" />
+            <Button
+              variant="outline"
+              size="sm"
+              className="border-zinc-800 bg-zinc-900/70 hover:bg-zinc-800 text-zinc-200 hover:text-white text-xs gap-1.5"
+            >
+              <Stethoscope className="size-3.5 text-[#FF2E75]" />
               {diagnosisAwal ? "Ubah Diagnosis" : "+ Isi Diagnosis"}
             </Button>
           </DialogTrigger>
-          <DialogContent>
+          <DialogContent className="bg-[#111116] border-zinc-800 text-zinc-100 sm:max-w-md">
             <DialogHeader>
-              <DialogTitle>Diagnosis Hasil Pemeriksaan Mekanik</DialogTitle>
+              <DialogTitle className="text-white font-semibold font-mono text-base">
+                Diagnosis Hasil Pemeriksaan Mekanik
+              </DialogTitle>
             </DialogHeader>
             <div className="space-y-3 py-2">
-              <Label htmlFor="diag-input">Catatan Diagnosis Masalah</Label>
+              <Label htmlFor="diag-input" className="text-xs font-semibold text-zinc-300 font-mono uppercase tracking-wider">
+                Catatan Diagnosis Masalah
+              </Label>
               <Textarea
                 id="diag-input"
                 value={diagnosis}
                 onChange={(e) => setDiagnosis(e.target.value)}
                 placeholder="Tuliskan temuan diagnosis teknis mekanik (misal: kebocoran oli seal kruk as belakang)..."
                 rows={4}
+                className="bg-zinc-900/80 border-zinc-800 text-white placeholder:text-zinc-600 focus-visible:border-[#FF2E75]"
               />
             </div>
-            <DialogFooter>
-              <Button variant="outline" onClick={() => setBukaDiagnosis(false)}>
+            <DialogFooter className="gap-2 sm:gap-0">
+              <Button
+                variant="outline"
+                onClick={() => setBukaDiagnosis(false)}
+                className="border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300"
+              >
                 Batal
               </Button>
-              <Button onClick={simpanDiagnosis} disabled={loading}>
+              <Button
+                onClick={simpanDiagnosis}
+                disabled={loading}
+                className="bg-primary hover:bg-primary-strong text-white font-medium shadow-md shadow-pink-950/30"
+              >
                 {loading ? <Loader2 className="size-4 animate-spin mr-1.5" /> : null}
                 Simpan Diagnosis
               </Button>

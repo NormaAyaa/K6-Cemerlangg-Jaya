@@ -4,7 +4,6 @@ import { BadgeStatus } from "@/components/BadgeStatus";
 import { Paginasi } from "@/components/Paginasi";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -120,25 +119,27 @@ export default async function HalamanWorkOrders({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-zinc-800/80 pb-5">
         <div>
-          <h1 className="text-2xl font-semibold text-text">Work Order</h1>
-          <p className="text-sm text-muted-foreground">
-            Daftar seluruh pengerjaan kendaraan di Cemerlang Jaya Motor
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            Work Order
+          </h1>
+          <p className="mt-1 text-xs text-zinc-400">
+            Daftar seluruh pengerjaan kendaraan di Bengkel Cemerlang Jaya Motor
           </p>
         </div>
         {bolehBuat && (
-          <Button asChild>
+          <Button asChild className="bg-primary hover:bg-primary-strong text-white font-medium shadow-md shadow-pink-950/30">
             <Link href="/work-orders/baru">
-              <Plus />
-              Work Order
+              <Plus className="mr-1.5 size-4" />
+              Work Order Baru
             </Link>
           </Button>
         )}
       </div>
 
       {/* Tab Status */}
-      <div className="flex overflow-x-auto border-b border-border pb-px scrollbar-none">
+      <div className="flex overflow-x-auto border-b border-zinc-800/80 pb-px scrollbar-none">
         <nav className="flex gap-2" aria-label="Status Work Order">
           {TAB_STATUS.map((tab) => {
             const aktif = status === tab.id;
@@ -147,16 +148,16 @@ export default async function HalamanWorkOrders({
               <Link
                 key={tab.id}
                 href={`/work-orders?status=${tab.id}&tim=${encodeURIComponent(filterTim)}&q=${encodeURIComponent(cari)}`}
-                className={`whitespace-nowrap px-3.5 py-2 text-sm font-medium transition-colors border-b-2 -mb-px flex items-center gap-1.5 ${
+                className={`whitespace-nowrap px-3.5 py-2 text-xs font-mono font-medium transition-colors border-b-2 -mb-px flex items-center gap-1.5 ${
                   aktif
-                    ? "border-primary text-primary"
-                    : "border-transparent text-muted-foreground hover:text-text hover:border-border"
+                    ? "border-[#FF2E75] text-[#FF2E75]"
+                    : "border-transparent text-zinc-400 hover:text-white hover:border-zinc-700"
                 }`}
               >
                 <span>{tab.label}</span>
                 <span
-                  className={`rounded-full px-1.5 py-0.5 text-xs ${
-                    aktif ? "bg-primary-soft text-primary-strong" : "bg-muted text-muted-foreground"
+                  className={`rounded-full px-1.5 py-0.5 text-[10px] font-mono ${
+                    aktif ? "bg-[#FF2E75]/20 text-[#FF2E75]" : "bg-zinc-800 text-zinc-400"
                   }`}
                 >
                   {jumlah}
@@ -174,16 +175,17 @@ export default async function HalamanWorkOrders({
           <Input
             name="q"
             defaultValue={q}
-            placeholder="Cari No WO, plat, atau pelanggan..."
+            placeholder="Cari No WO, plat nomor, atau pelanggan..."
             aria-label="Cari Work Order"
+            className="bg-zinc-900/80 border-zinc-800 text-white placeholder:text-zinc-600 focus-visible:border-[#FF2E75] focus-visible:ring-[#FF2E75]"
           />
         </div>
 
-        <div className="w-48">
+        <div className="w-52">
           <select
             name="tim"
             defaultValue={filterTim}
-            className="w-full h-9 rounded-md border border-input bg-card px-3 py-1 text-sm shadow-xs focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring"
+            className="w-full h-9 rounded-md border border-zinc-800 bg-zinc-900/80 px-3 py-1 text-xs text-zinc-200 shadow-xs focus:border-[#FF2E75] focus:outline-none"
             aria-label="Pilih Tim"
           >
             <option value="semua">Semua Tim</option>
@@ -195,37 +197,41 @@ export default async function HalamanWorkOrders({
           </select>
         </div>
 
-        <Button type="submit" variant="outline">
-          <Search />
+        <Button
+          type="submit"
+          variant="outline"
+          className="border-zinc-800 bg-zinc-900/70 hover:bg-zinc-800 text-zinc-200 hover:text-white text-xs gap-1.5 h-9"
+        >
+          <Search className="size-3.5 text-[#FF2E75]" />
           Terapkan
         </Button>
       </form>
 
       {/* Tabel Work Order */}
-      <Card className="py-0">
+      <div className="rounded-xl border border-zinc-800/80 bg-[#111116] overflow-hidden shadow-sm">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="pl-4">No WO</TableHead>
-              <TableHead>Plat</TableHead>
-              <TableHead>Pelanggan</TableHead>
-              <TableHead>Tim Mekanik</TableHead>
-              <TableHead>Estimasi Selesai</TableHead>
-              <TableHead className="text-right">Total Tagihan</TableHead>
-              <TableHead className="pr-4">Status</TableHead>
+            <TableRow className="bg-zinc-900/90 border-b border-zinc-800 hover:bg-zinc-900/90">
+              <TableHead className="pl-4 text-zinc-400 text-[11px] font-mono font-semibold uppercase tracking-wider">No WO</TableHead>
+              <TableHead className="text-zinc-400 text-[11px] font-mono font-semibold uppercase tracking-wider">Plat</TableHead>
+              <TableHead className="text-zinc-400 text-[11px] font-mono font-semibold uppercase tracking-wider">Pelanggan</TableHead>
+              <TableHead className="text-zinc-400 text-[11px] font-mono font-semibold uppercase tracking-wider">Tim Mekanik</TableHead>
+              <TableHead className="text-zinc-400 text-[11px] font-mono font-semibold uppercase tracking-wider">Estimasi Selesai</TableHead>
+              <TableHead className="text-right text-zinc-400 text-[11px] font-mono font-semibold uppercase tracking-wider">Total Tagihan</TableHead>
+              <TableHead className="pr-4 text-zinc-400 text-[11px] font-mono font-semibold uppercase tracking-wider">Status</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className="text-xs">
             {error && (
-              <TableRow>
-                <TableCell colSpan={7} className="py-10 text-center text-danger">
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={7} className="py-10 text-center text-rose-400 font-mono">
                   Gagal memuat data Work Order. Silakan muat ulang halaman ini.
                 </TableCell>
               </TableRow>
             )}
             {!error && workOrders?.length === 0 && (
-              <TableRow>
-                <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={7} className="py-10 text-center text-zinc-500 font-mono">
                   {cari ? `Tidak ada Work Order yang cocok dengan "${cari}".` : "Belum ada Work Order di kategori ini."}
                 </TableCell>
               </TableRow>
@@ -233,6 +239,7 @@ export default async function HalamanWorkOrders({
             {workOrders?.map((wo) => {
               // Hitung total tagihan: prioritas invoices.total, jika belum terbit maka sum billing_items - diskon
               const subtotalItem = wo.billing_items?.reduce((acc, b) => acc + b.jumlah * Number(b.harga_dipakai), 0) ?? 0;
+              // eslint-disable-next-line @typescript-eslint/no-explicit-any
               const totalInvoice = (Array.isArray(wo.invoices) ? (wo.invoices as any)[0]?.total : (wo.invoices as any)?.total);
               const totalTagihan = totalInvoice ?? Math.max(0, subtotalItem - Number(wo.diskon || 0));
 
@@ -242,21 +249,27 @@ export default async function HalamanWorkOrders({
                 !["selesai", "siap_diambil", "diambil", "dibatalkan"].includes(wo.status);
 
               return (
-                <TableRow key={wo.id}>
-                  <TableCell className="pl-4 font-medium">
-                    <Link href={`/work-orders/${wo.id}`} className="text-primary hover:underline">
+                <TableRow key={wo.id} className="border-b border-zinc-800/50 hover:bg-zinc-800/30 transition-colors">
+                  <TableCell className="pl-4 font-mono font-semibold">
+                    <Link href={`/work-orders/${wo.id}`} className="text-[#FF2E75] hover:underline">
                       {wo.nomor}
                     </Link>
                   </TableCell>
-                  <TableCell className="font-semibold text-text">{wo.vehicles?.plat ?? "-"}</TableCell>
-                  <TableCell>{wo.customers?.nama ?? "-"}</TableCell>
-                  <TableCell className="text-muted-foreground">{wo.profiles?.nama ?? "-"}</TableCell>
-                  <TableCell className="tabular-nums">
+                  <TableCell className="font-mono font-bold text-white tracking-wider">
+                    {wo.vehicles?.plat ?? "-"}
+                  </TableCell>
+                  <TableCell className="text-zinc-200">
+                    {wo.customers?.nama ?? "-"}
+                  </TableCell>
+                  <TableCell className="text-zinc-400">
+                    {wo.profiles?.nama ?? "-"}
+                  </TableCell>
+                  <TableCell className="font-mono text-zinc-300">
                     {wo.estimasi_selesai ? (
                       <span className="flex items-center gap-1.5">
                         {tanggal(wo.estimasi_selesai)}
                         {terlambat && (
-                          <Badge variant="destructive" className="px-1.5 py-0 text-[11px] font-semibold">
+                          <Badge variant="outline" className="border-rose-500/20 bg-rose-500/10 text-rose-400 px-1.5 py-0 text-[10px] font-mono font-bold">
                             <AlertCircle className="size-3 mr-0.5" />
                             Terlambat
                           </Badge>
@@ -266,7 +279,7 @@ export default async function HalamanWorkOrders({
                       "-"
                     )}
                   </TableCell>
-                  <TableCell className="text-right font-medium tabular-nums">
+                  <TableCell className="text-right font-mono font-medium text-white">
                     {totalTagihan > 0 ? rupiah(Number(totalTagihan)) : "-"}
                   </TableCell>
                   <TableCell className="pr-4">
@@ -277,7 +290,7 @@ export default async function HalamanWorkOrders({
             })}
           </TableBody>
         </Table>
-      </Card>
+      </div>
 
       <Paginasi
         halaman={halaman}

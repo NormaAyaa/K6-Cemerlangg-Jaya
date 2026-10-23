@@ -1,8 +1,6 @@
 import { redirect } from "next/navigation";
 import { Search } from "lucide-react";
 import { Paginasi } from "@/components/Paginasi";
-import { Badge } from "@/components/ui/badge";
-import { Card } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -13,7 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { tanggal } from "@/lib/format";
-import { LABEL_PERAN, type Peran } from "@/lib/peran";
+import { LABEL_PERAN } from "@/lib/peran";
 import { ambilProfilSaya } from "@/lib/profil";
 import { createClient } from "@/lib/supabase/server";
 import { FormPengguna } from "./FormPengguna";
@@ -52,11 +50,13 @@ export default async function HalamanPengguna({
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between border-b border-zinc-800/80 pb-5">
         <div>
-          <h1 className="text-2xl font-semibold text-text">Pengguna</h1>
-          <p className="text-sm text-text-muted">
-            Kelola nama, peran, dan status aktif akun pengguna sistem bengkel.
+          <h1 className="text-2xl sm:text-3xl font-bold tracking-tight text-white">
+            Pengguna
+          </h1>
+          <p className="mt-1 text-xs text-zinc-400">
+            Kelola nama, hak peran, dan status aktif akun pengguna sistem bengkel
           </p>
         </div>
       </div>
@@ -64,83 +64,89 @@ export default async function HalamanPengguna({
       {/* Pencarian */}
       <div className="flex flex-wrap items-center justify-between gap-3">
         <form className="relative flex-1 sm:max-w-xs">
-          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-text-muted" />
+          <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-zinc-500" />
           <Input
             name="q"
             defaultValue={q}
             placeholder="Cari nama atau email..."
-            className="pl-9"
+            className="pl-9 text-xs border-zinc-800 bg-[#111116] text-white placeholder:text-zinc-500 focus-visible:border-primary/50"
           />
         </form>
       </div>
 
       {/* Tabel Pengguna */}
-      <Card className="overflow-hidden">
+      <div className="rounded-xl border border-zinc-800/80 bg-[#111116] shadow-sm overflow-hidden">
         <Table>
-          <TableHeader>
-            <TableRow>
-              <TableHead>Nama Pengguna</TableHead>
-              <TableHead>Email</TableHead>
-              <TableHead className="text-center">Peran</TableHead>
-              <TableHead className="text-center">Status</TableHead>
-              <TableHead className="text-right">Dibuat Pada</TableHead>
-              <TableHead className="text-right">Aksi</TableHead>
+          <TableHeader className="bg-zinc-900/60 border-b border-zinc-800/80">
+            <TableRow className="border-b border-zinc-800/80 hover:bg-transparent">
+              <TableHead className="text-zinc-400 font-semibold text-xs uppercase tracking-wider">Nama Pengguna</TableHead>
+              <TableHead className="text-zinc-400 font-semibold text-xs uppercase tracking-wider">Email</TableHead>
+              <TableHead className="text-center text-zinc-400 font-semibold text-xs uppercase tracking-wider">Peran</TableHead>
+              <TableHead className="text-center text-zinc-400 font-semibold text-xs uppercase tracking-wider">Status</TableHead>
+              <TableHead className="text-right text-zinc-400 font-semibold text-xs uppercase tracking-wider">Dibuat Pada</TableHead>
+              <TableHead className="text-right text-zinc-400 font-semibold text-xs uppercase tracking-wider">Aksi</TableHead>
             </TableRow>
           </TableHeader>
-          <TableBody>
+          <TableBody className="divide-y divide-zinc-800/60">
             {(pengguna ?? []).length === 0 ? (
-              <TableRow>
-                <TableCell colSpan={6} className="h-28 text-center text-text-muted">
+              <TableRow className="border-b border-zinc-800/60 hover:bg-transparent">
+                <TableCell colSpan={6} className="h-28 text-center text-xs text-zinc-500">
                   Tidak ada pengguna yang ditemukan.
                 </TableCell>
               </TableRow>
             ) : (
               (pengguna ?? []).map((u) => {
-                let badgePeran = <Badge variant="outline">{u.role}</Badge>;
+                let badgePeran = (
+                  <span className="inline-flex items-center rounded-full border border-zinc-700 bg-zinc-800 px-2.5 py-0.5 text-[11px] font-medium text-zinc-300">
+                    {u.role}
+                  </span>
+                );
                 if (u.role === "owner") {
                   badgePeran = (
-                    <Badge variant="outline" className="border-indigo-600/30 bg-indigo-50 text-indigo-700">
+                    <span className="inline-flex items-center rounded-full border border-pink-500/30 bg-pink-950/40 px-2.5 py-0.5 text-[11px] font-medium text-pink-300">
                       {LABEL_PERAN.owner}
-                    </Badge>
+                    </span>
                   );
                 } else if (u.role === "admin") {
                   badgePeran = (
-                    <Badge variant="outline" className="border-sky-600/30 bg-sky-50 text-sky-700">
+                    <span className="inline-flex items-center rounded-full border border-sky-500/30 bg-sky-950/40 px-2.5 py-0.5 text-[11px] font-medium text-sky-400">
                       {LABEL_PERAN.admin}
-                    </Badge>
+                    </span>
                   );
                 } else if (u.role === "kepala_mekanik") {
                   badgePeran = (
-                    <Badge variant="outline" className="border-amber-600/30 bg-amber-50 text-amber-700">
+                    <span className="inline-flex items-center rounded-full border border-amber-500/30 bg-amber-950/40 px-2.5 py-0.5 text-[11px] font-medium text-amber-400">
                       {LABEL_PERAN.kepala_mekanik}
-                    </Badge>
+                    </span>
                   );
                 }
 
                 return (
-                  <TableRow key={u.id}>
-                    <TableCell className="font-medium text-text">
+                  <TableRow key={u.id} className="border-b border-zinc-800/60 hover:bg-zinc-800/40 transition-colors">
+                    <TableCell className="font-medium text-white">
                       {u.nama}
                       {u.id === profil.id && (
-                        <span className="ml-2 text-xs text-text-muted">(Anda)</span>
+                        <span className="ml-2 rounded bg-zinc-800 px-1.5 py-0.5 text-[10px] font-medium text-primary">
+                          (Anda)
+                        </span>
                       )}
                     </TableCell>
-                    <TableCell className="font-mono text-xs text-text-muted">
+                    <TableCell className="font-mono text-xs text-zinc-400">
                       {u.email}
                     </TableCell>
                     <TableCell className="text-center">{badgePeran}</TableCell>
                     <TableCell className="text-center">
                       {u.aktif ? (
-                        <Badge variant="outline" className="border-emerald-600/30 bg-emerald-50 text-emerald-700">
+                        <span className="inline-flex items-center rounded-full border border-emerald-500/30 bg-emerald-950/40 px-2.5 py-0.5 text-[11px] font-medium text-emerald-400">
                           Aktif
-                        </Badge>
+                        </span>
                       ) : (
-                        <Badge variant="outline" className="border-rose-600/30 bg-rose-50 text-rose-700">
+                        <span className="inline-flex items-center rounded-full border border-rose-500/30 bg-rose-950/40 px-2.5 py-0.5 text-[11px] font-medium text-rose-400">
                           Nonaktif
-                        </Badge>
+                        </span>
                       )}
                     </TableCell>
-                    <TableCell className="text-right text-xs text-text-muted">
+                    <TableCell className="text-right text-xs text-zinc-400">
                       {tanggal(u.created_at)}
                     </TableCell>
                     <TableCell className="text-right">
@@ -152,7 +158,7 @@ export default async function HalamanPengguna({
             )}
           </TableBody>
         </Table>
-      </Card>
+      </div>
 
       <Paginasi
         halaman={halaman}

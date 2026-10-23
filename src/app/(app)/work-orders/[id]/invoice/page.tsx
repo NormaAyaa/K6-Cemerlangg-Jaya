@@ -2,7 +2,6 @@ import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { ArrowLeft, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent } from "@/components/ui/card";
 import { rupiah, tanggal, tanggalWaktu } from "@/lib/format";
 import { ambilProfilSaya } from "@/lib/profil";
 import { createClient } from "@/lib/supabase/server";
@@ -73,29 +72,31 @@ export default async function InvoiceWorkOrder({
   if (!rawInvoice) {
     return (
       <div className="max-w-3xl mx-auto space-y-6 py-8">
-        <Button asChild variant="outline" className="gap-2">
+        <Button
+          asChild
+          variant="outline"
+          className="gap-1.5 border-zinc-800 bg-zinc-900/70 hover:bg-zinc-800 text-zinc-200 hover:text-white font-mono text-xs"
+        >
           <Link href={`/work-orders/${id}/tagihan`}>
-            <ArrowLeft className="size-4" />
+            <ArrowLeft className="size-3.5 text-[#FF2E75]" />
             Kembali ke Tagihan
           </Link>
         </Button>
 
-        <Card className="border-border">
-          <CardContent className="p-12 text-center space-y-4">
-            <div className="mx-auto size-12 rounded-full bg-warning/20 flex items-center justify-center text-warning">
-              <AlertCircle className="size-6" />
-            </div>
-            <h1 className="text-xl font-bold text-text">Invoice Belum Diterbitkan</h1>
-            <p className="text-sm text-text-muted max-w-md mx-auto">
-              Invoice untuk Work Order <span className="font-semibold text-text">{wo.nomor}</span> belum
-              diterbitkan. Pastikan status WO sudah mencapai &quot;Siap Diambil&quot;, lalu terbitkan invoice melalui
-              tab Tagihan.
-            </p>
-            <Button asChild className="bg-primary hover:bg-primary-strong text-white mt-2">
-              <Link href={`/work-orders/${id}/tagihan`}>Buka Halaman Tagihan</Link>
-            </Button>
-          </CardContent>
-        </Card>
+        <div className="rounded-xl border border-zinc-800/80 bg-[#111116] p-12 text-center space-y-4 shadow-sm">
+          <div className="mx-auto size-12 rounded-full bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400">
+            <AlertCircle className="size-6" />
+          </div>
+          <h1 className="text-xl font-bold font-mono text-white">Invoice Belum Diterbitkan</h1>
+          <p className="text-xs text-zinc-400 max-w-md mx-auto">
+            Invoice untuk Work Order <span className="font-semibold text-white font-mono">{wo.nomor}</span> belum
+            diterbitkan. Pastikan status WO sudah mencapai &quot;Siap Diambil&quot;, lalu terbitkan invoice melalui
+            tab Tagihan.
+          </p>
+          <Button asChild className="bg-primary hover:bg-primary-strong text-white font-medium shadow-md shadow-pink-950/30 mt-2">
+            <Link href={`/work-orders/${id}/tagihan`}>Buka Halaman Tagihan</Link>
+          </Button>
+        </div>
       </div>
     );
   }
@@ -147,7 +148,7 @@ export default async function InvoiceWorkOrder({
   const statusBayar = rawInvoice.status_bayar;
 
   return (
-    <div className="max-w-4xl mx-auto py-4">
+    <div className="max-w-4xl mx-auto py-4 pb-16">
       {/* Tombol Aksi di Layar (Sembunyi saat Cetak) */}
       <TombolCetak
         woId={id}
@@ -157,8 +158,8 @@ export default async function InvoiceWorkOrder({
         peran={profil.peran}
       />
 
-      {/* Lembar Invoice A4 Siap Cetak */}
-      <div className="bg-white border border-border shadow-md rounded-xl p-8 sm:p-12 text-slate-800 print:border-none print:shadow-none print:p-0 print:m-0 print:rounded-none">
+      {/* Lembar Invoice A4 Siap Cetak (Dokumen kertas putih standar faktur resmi) */}
+      <div className="bg-white border border-zinc-300 shadow-2xl rounded-xl p-8 sm:p-12 text-slate-800 print:border-none print:shadow-none print:p-0 print:m-0 print:rounded-none">
         {/* Header Bengkel */}
         <div className="flex flex-wrap items-start justify-between gap-6 pb-6 border-b-2 border-slate-800">
           <div className="flex items-start gap-4">
@@ -190,7 +191,7 @@ export default async function InvoiceWorkOrder({
             <div className="text-base font-bold text-slate-900 font-mono">
               {rawInvoice.nomor}
             </div>
-            <div className="text-xs text-slate-500 mt-0.5">
+            <div className="text-xs text-slate-500 mt-0.5 font-mono">
               Tanggal: {tanggal(rawInvoice.diterbitkan_at)}
             </div>
           </div>
@@ -203,7 +204,7 @@ export default async function InvoiceWorkOrder({
               Ditujukan Kepada
             </p>
             <p className="font-bold text-sm text-slate-900">{pelanggan?.nama}</p>
-            <p className="text-slate-600">Telepon: {pelanggan?.telepon}</p>
+            <p className="text-slate-600 font-mono">Telepon: {pelanggan?.telepon}</p>
             {pelanggan?.alamat && (
               <p className="text-slate-600 max-w-xs">{pelanggan.alamat}</p>
             )}
@@ -282,7 +283,7 @@ export default async function InvoiceWorkOrder({
                 </span>
               </div>
               {statusBayar === "lunas" && (
-                <p className="text-[11px] text-slate-500 mt-1.5">
+                <p className="text-[11px] text-slate-500 mt-1.5 font-mono">
                   Waktu dibayar:{" "}
                   <span className="font-semibold text-slate-800">
                     {tanggalWaktu(
@@ -304,7 +305,7 @@ export default async function InvoiceWorkOrder({
                 </p>
                 <div className="space-y-1 text-slate-600">
                   {payments.map((p) => (
-                    <div key={p.id} className="flex items-center gap-3">
+                    <div key={p.id} className="flex items-center gap-3 font-mono text-[11px]">
                       <span>• {tanggal(p.created_at)}</span>
                       <span className="uppercase font-semibold text-[10px] bg-slate-100 px-1.5 py-0.5 rounded">
                         {p.metode}
@@ -320,7 +321,7 @@ export default async function InvoiceWorkOrder({
           </div>
 
           {/* Kolom Angka Total */}
-          <div className="space-y-2 text-xs">
+          <div className="space-y-2 text-xs font-mono">
             <div className="flex justify-between text-slate-600">
               <span>Subtotal</span>
               <span className="font-medium tabular-nums">{rupiah(subtotal)}</span>

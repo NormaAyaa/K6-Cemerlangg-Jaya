@@ -10,7 +10,14 @@ import {
   DialogTitle,
   DialogTrigger,
 } from "@/components/ui/dialog";
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
 
 export type AuditLogEntry = {
   id: number;
@@ -54,65 +61,76 @@ export function DialogDetailAudit({ log }: { log: AuditLogEntry }) {
     };
   });
 
-  const barisTampil = hanyaBerubah && log.aksi === "UPDATE"
-    ? daftarKolom.filter((c) => c.berubah)
-    : daftarKolom;
+  const barisTampil =
+    hanyaBerubah && log.aksi === "UPDATE"
+      ? daftarKolom.filter((c) => c.berubah)
+      : daftarKolom;
 
   return (
     <Dialog open={buka} onOpenChange={setBuka}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="h-7 text-xs gap-1">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-7 text-xs gap-1 border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:bg-zinc-800 hover:text-white hover:border-primary/40"
+        >
           <Eye className="size-3.5" />
           Detail
         </Button>
       </DialogTrigger>
-      <DialogContent className="max-w-3xl max-h-[90vh] overflow-y-auto">
+      <DialogContent className="bg-[#111116] border border-zinc-800 text-white max-w-3xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2 text-base font-semibold">
+          <DialogTitle className="flex items-center gap-2 text-base font-semibold text-white">
             <History className="size-4 text-primary" />
             Audit Log #{log.id} · Perbandingan Nilai
           </DialogTitle>
         </DialogHeader>
 
         {/* Info Ringkasan Header */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 rounded-lg bg-bg-app text-xs border border-border">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 p-3 rounded-lg bg-zinc-900/80 text-xs border border-zinc-800">
           <div>
-            <span className="text-text-muted block">Aksi</span>
-            <span className="font-semibold">{log.aksi}</span>
+            <span className="text-zinc-400 block">Aksi</span>
+            <span className="font-semibold text-white">{log.aksi}</span>
           </div>
           <div>
-            <span className="text-text-muted block">Tabel / Entitas</span>
-            <span className="font-semibold font-mono">{log.tabel}</span>
+            <span className="text-zinc-400 block">Tabel / Entitas</span>
+            <span className="font-semibold font-mono text-pink-300">{log.tabel}</span>
           </div>
           <div>
-            <span className="text-text-muted block">Pelaku</span>
-            <span className="font-semibold">{log.pelaku_nama} ({log.pelaku_peran || "Sistem"})</span>
+            <span className="text-zinc-400 block">Pelaku</span>
+            <span className="font-semibold text-white">
+              {log.pelaku_nama} ({log.pelaku_peran || "Sistem"})
+            </span>
           </div>
           <div>
-            <span className="text-text-muted block">ID Data</span>
-            <span className="font-mono text-text-muted truncate block">{log.data_id || "-"}</span>
+            <span className="text-zinc-400 block">ID Data</span>
+            <span className="font-mono text-zinc-400 truncate block">
+              {log.data_id || "-"}
+            </span>
           </div>
         </div>
 
         {log.alasan && (
-          <div className="p-3 rounded-lg bg-amber-500/10 border border-amber-500/20 text-xs">
-            <span className="font-medium text-amber-700 dark:text-amber-400 block mb-0.5">Alasan / Catatan:</span>
-            <p className="text-text">{log.alasan}</p>
+          <div className="p-3 rounded-lg bg-amber-950/30 border border-amber-900/50 text-xs">
+            <span className="font-medium text-amber-400 block mb-0.5">
+              Alasan / Catatan:
+            </span>
+            <p className="text-zinc-200">{log.alasan}</p>
           </div>
         )}
 
         {/* Kontrol Filter Kolom Berubah jika UPDATE */}
         {log.aksi === "UPDATE" && (
           <div className="flex items-center justify-between pt-2">
-            <span className="text-xs text-text-muted">
+            <span className="text-xs text-zinc-400">
               {daftarKolom.filter((c) => c.berubah).length} dari {daftarKolom.length} kolom berubah
             </span>
-            <label className="flex items-center gap-2 text-xs text-text cursor-pointer">
+            <label className="flex items-center gap-2 text-xs text-zinc-300 cursor-pointer select-none">
               <input
                 type="checkbox"
                 checked={hanyaBerubah}
                 onChange={(e) => setHanyaBerubah(e.target.checked)}
-                className="rounded border-border size-3.5"
+                className="rounded border-zinc-700 bg-zinc-900 size-3.5 accent-pink-600"
               />
               Hanya tampilkan kolom yang berubah
             </label>
@@ -120,23 +138,32 @@ export function DialogDetailAudit({ log }: { log: AuditLogEntry }) {
         )}
 
         {/* Tabel Komparasi Nilai Sebelum dan Sesudah */}
-        <div className="border border-border rounded-lg overflow-hidden">
+        <div className="border border-zinc-800 rounded-lg overflow-hidden">
           <Table>
-            <TableHeader className="bg-bg-app">
-              <TableRow>
-                <TableHead className="w-1/4 text-xs">Kolom</TableHead>
+            <TableHeader className="bg-zinc-900/80 border-b border-zinc-800">
+              <TableRow className="border-b border-zinc-800 hover:bg-transparent">
+                <TableHead className="w-1/4 text-xs text-zinc-400 font-semibold uppercase tracking-wider">
+                  Kolom
+                </TableHead>
                 {log.aksi !== "INSERT" && (
-                  <TableHead className="w-[37.5%] text-xs">Nilai Sebelum</TableHead>
+                  <TableHead className="w-[37.5%] text-xs text-zinc-400 font-semibold uppercase tracking-wider">
+                    Nilai Sebelum
+                  </TableHead>
                 )}
                 {log.aksi !== "DELETE" && (
-                  <TableHead className="w-[37.5%] text-xs">Nilai Sesudah</TableHead>
+                  <TableHead className="w-[37.5%] text-xs text-zinc-400 font-semibold uppercase tracking-wider">
+                    Nilai Sesudah
+                  </TableHead>
                 )}
               </TableRow>
             </TableHeader>
-            <TableBody>
+            <TableBody className="divide-y divide-zinc-800/60">
               {barisTampil.length === 0 ? (
-                <TableRow>
-                  <TableCell colSpan={3} className="text-center text-xs text-text-muted py-6">
+                <TableRow className="border-b border-zinc-800/60 hover:bg-transparent">
+                  <TableCell
+                    colSpan={3}
+                    className="text-center text-xs text-zinc-500 py-6"
+                  >
                     Tidak ada perubahan nilai kolom yang tercatat.
                   </TableCell>
                 </TableRow>
@@ -144,25 +171,44 @@ export function DialogDetailAudit({ log }: { log: AuditLogEntry }) {
                 barisTampil.map((item) => (
                   <TableRow
                     key={item.kolom}
-                    className={`text-xs ${item.berubah && log.aksi === "UPDATE" ? "bg-amber-500/5 font-medium" : ""}`}
+                    className={`text-xs border-b border-zinc-800/60 hover:bg-zinc-800/40 transition-colors ${
+                      item.berubah && log.aksi === "UPDATE"
+                        ? "bg-amber-950/15 font-medium"
+                        : ""
+                    }`}
                   >
-                    <TableCell className="font-mono text-text">
+                    <TableCell className="font-mono text-zinc-200">
                       <div className="flex items-center gap-1.5">
                         {item.kolom}
                         {item.berubah && log.aksi === "UPDATE" && (
-                          <span className="size-1.5 rounded-full bg-amber-500" title="Berubah" />
+                          <span
+                            className="size-1.5 rounded-full bg-amber-400"
+                            title="Berubah"
+                          />
                         )}
                       </div>
                     </TableCell>
 
                     {log.aksi !== "INSERT" && (
-                      <TableCell className={`font-mono break-all ${item.berubah ? "text-rose-600 dark:text-rose-400 bg-rose-500/5" : "text-text-muted"}`}>
+                      <TableCell
+                        className={`font-mono break-all ${
+                          item.berubah
+                            ? "text-rose-400 bg-rose-950/20"
+                            : "text-zinc-500"
+                        }`}
+                      >
                         {formatNilai(item.nilaiSebelum)}
                       </TableCell>
                     )}
 
                     {log.aksi !== "DELETE" && (
-                      <TableCell className={`font-mono break-all ${item.berubah ? "text-emerald-600 dark:text-emerald-400 bg-emerald-500/5" : "text-text-muted"}`}>
+                      <TableCell
+                        className={`font-mono break-all ${
+                          item.berubah
+                            ? "text-emerald-400 bg-emerald-950/20"
+                            : "text-zinc-500"
+                        }`}
+                      >
                         {formatNilai(item.nilaiSesudah)}
                       </TableCell>
                     )}

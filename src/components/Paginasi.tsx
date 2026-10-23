@@ -1,3 +1,4 @@
+import { cn } from "@/lib/utils";
 import {
   Pagination,
   PaginationContent,
@@ -10,9 +11,6 @@ import {
 /**
  * Navigasi halaman untuk daftar berhalaman. Parameter lain di URL (pencarian,
  * penyaring) dipertahankan; hanya `hal` yang berganti.
- *
- * Page navigation for paginated lists. Other URL params (search, filters)
- * are kept; only `hal` changes.
  */
 export function Paginasi({
   halaman,
@@ -36,22 +34,31 @@ export function Paginasi({
   };
 
   return (
-    <div className="flex flex-wrap items-center justify-between gap-3">
-      <p className="text-sm text-muted-foreground">
-        Halaman {halaman} dari {totalHalaman} · {totalBaris} data
+    <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
+      <p className="text-xs text-zinc-400">
+        Halaman <span className="text-white font-medium">{halaman}</span> dari{" "}
+        <span className="text-white font-medium">{totalHalaman}</span> ·{" "}
+        <span className="text-zinc-300 font-medium">{totalBaris}</span> data
       </p>
       <Pagination className="mx-0 w-auto">
-        <PaginationContent>
+        <PaginationContent className="gap-1.5">
           <PaginationItem>
             <PaginationPrevious
               text="Sebelumnya"
               href={href(halaman - 1)}
               aria-disabled={halaman <= 1}
-              className={halaman <= 1 ? "pointer-events-none opacity-50" : undefined}
+              className={cn(
+                "border border-zinc-800 bg-[#111116] text-zinc-300 hover:bg-zinc-800 hover:text-white text-xs h-8 px-3",
+                halaman <= 1 && "pointer-events-none opacity-40"
+              )}
             />
           </PaginationItem>
           <PaginationItem>
-            <PaginationLink href={href(halaman)} isActive>
+            <PaginationLink
+              href={href(halaman)}
+              isActive
+              className="border border-primary/40 bg-primary/15 text-primary hover:bg-primary/20 text-xs font-semibold h-8 min-w-8"
+            >
               {halaman}
             </PaginationLink>
           </PaginationItem>
@@ -60,7 +67,10 @@ export function Paginasi({
               text="Berikutnya"
               href={href(halaman + 1)}
               aria-disabled={halaman >= totalHalaman}
-              className={halaman >= totalHalaman ? "pointer-events-none opacity-50" : undefined}
+              className={cn(
+                "border border-zinc-800 bg-[#111116] text-zinc-300 hover:bg-zinc-800 hover:text-white text-xs h-8 px-3",
+                halaman >= totalHalaman && "pointer-events-none opacity-40"
+              )}
             />
           </PaginationItem>
         </PaginationContent>
