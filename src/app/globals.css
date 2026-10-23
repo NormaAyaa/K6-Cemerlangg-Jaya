@@ -123,6 +123,57 @@
   --sidebar-ring: #2196F3;
 }
 
+/*
+ * Tema gelap khusus halaman Tagihan (Fitur B), memakai aksen pink.
+ * Sengaja dibatasi pada kelas ini agar halaman lain tetap memakai tema terang PRD Bab 13.
+ *
+ * Dark theme scoped to the Billing page only, with a pink accent.
+ * Deliberately scoped so every other page keeps the light PRD Chapter 13 theme.
+ */
+.tema-tagihan {
+  color-scheme: dark;
+
+  --bg-app: #08080B;
+  --bg-panel: #111116;
+  --text: #F5F5F7;
+  --text-body: #C9C9D1;
+  --text-muted: #8E8E99;
+
+  --success: #3DDC84;
+  --warning: #FBBF24;
+  --danger: #F87171;
+
+  --primary: #E91E63;
+  --primary-strong: #C2185B;
+  --primary-soft: #2B0F1B;
+  --primary-foreground: #FFFFFF;
+
+  --background: var(--bg-app);
+  --foreground: var(--text);
+  --card: var(--bg-panel);
+  --card-foreground: var(--text);
+  --popover: #16161C;
+  --popover-foreground: var(--text);
+  --secondary: #1F1F27;
+  --secondary-foreground: #E7E7EC;
+  --muted: #1A1A21;
+  --muted-foreground: var(--text-muted);
+  --accent: var(--primary-soft);
+  --accent-foreground: #FF7AA8;
+  --destructive: var(--danger);
+  --border: #26262F;
+  --input: #33333E;
+  --ring: var(--primary);
+
+  --sidebar: #0B0B0F;
+  --sidebar-foreground: var(--text-body);
+  --sidebar-primary: var(--primary);
+  --sidebar-accent: var(--primary-soft);
+  --sidebar-accent-foreground: #FF7AA8;
+  --sidebar-border: #26262F;
+  --sidebar-ring: var(--primary);
+}
+
 
 @layer base {
   * {

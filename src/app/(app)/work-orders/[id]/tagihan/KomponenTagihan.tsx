@@ -11,6 +11,11 @@ import {
   CreditCard,
   Percent,
   Info,
+  ReceiptText,
+  Wallet,
+  AlertCircle,
+  TrendingUp,
+  type LucideIcon,
 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
@@ -48,6 +53,7 @@ import {
   TooltipTrigger,
 } from "@/components/ui/tooltip";
 import { rupiah, tanggal } from "@/lib/format";
+import { cn } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 
 export interface ItemTagihan {
@@ -180,6 +186,8 @@ export function KomponenTagihan({
   const totalTagihan = invoice ? invoice.total : Math.max(0, subtotalTagihan - nilaiDiskon);
   const totalTerbayar = invoice ? invoice.terbayar : 0;
   const sisaTagihan = invoice ? Math.max(0, invoice.total - invoice.terbayar) : totalTagihan;
+  const persenTerbayar =
+    totalTagihan > 0 ? Math.min(100, Math.round((totalTerbayar / totalTagihan) * 100)) : 0;
 
   // Owner Cost and Profit
   const totalModal = items.reduce((acc, it) => acc + it.jumlah * (it.harga_modal || 0), 0);
@@ -392,146 +400,193 @@ export function KomponenTagihan({
 
   return (
     <div className="space-y-6">
-      {/* Kartu Header Rangkuman WO */}
-      <Card className="border-border shadow-xs">
-        <CardContent className="p-5 flex flex-wrap items-center justify-between gap-4">
-          <div className="space-y-1">
-            <div className="flex items-center gap-3">
-              <span className="text-xl font-bold text-text">{nomorWo}</span>
-              <Badge variant="outline" className="text-xs font-semibold px-2.5 py-0.5">
-                {platKendaraan} · {merekModel}
-              </Badge>
-              {invoice ? (
-                <Badge
-                  className={
-                    invoice.status_bayar === "lunas"
-                      ? "bg-success text-white"
-                      : invoice.status_bayar === "sebagian"
-                      ? "bg-warning text-white"
-                      : "bg-muted-foreground text-white"
-                  }
-                >
-                  {invoice.status_bayar === "lunas"
-                    ? "Invoice Lunas"
-                    : invoice.status_bayar === "sebagian"
-                    ? "Dibayar Sebagian"
-                    : "Belum Bayar"}
-                </Badge>
-              ) : (
-                <Badge variant="secondary" className="text-xs">
-                  Tagihan Terbuka (Belum Invoice)
-                </Badge>
+      {/* Header halaman & aksi utama */}
+      <div className="flex flex-wrap items-start justify-between gap-4">
+        <div className="space-y-1">
+          <h1 className="text-2xl font-bold tracking-tight text-text">Tagihan &amp; Invoice</h1>
+          <p className="text-sm text-text-muted">
+            {nomorWo} · {platKendaraan} · {merekModel} · {namaPelanggan}
+          </p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          {invoice ? (
+            <Badge
+              className={cn(
+                "px-2.5 py-1 text-xs font-semibold",
+                invoice.status_bayar === "lunas" &&
+                  "border border-success/30 bg-success/10 text-success",
+                invoice.status_bayar === "sebagian" &&
+                  "border border-warning/30 bg-warning/10 text-warning",
+                invoice.status_bayar === "belum_bayar" &&
+                  "border border-border bg-muted text-text-muted",
               )}
-            </div>
-            <p className="text-sm text-text-muted">
-              Pelanggan: <span className="font-medium text-text">{namaPelanggan}</span>
-            </p>
-          </div>
+            >
+              {invoice.status_bayar === "lunas"
+                ? "Invoice Lunas"
+                : invoice.status_bayar === "sebagian"
+                ? "Dibayar Sebagian"
+                : "Belum Bayar"}
+            </Badge>
+          ) : (
+            <Badge variant="outline" className="border-border px-2.5 py-1 text-xs text-text-muted">
+              Tagihan Terbuka
+            </Badge>
+          )}
 
-          <div className="flex flex-wrap items-center gap-2">
-            {/* Tombol Lihat Invoice jika sudah terbit */}
-            {invoice && (
-              <Button asChild variant="outline" className="gap-2 border-primary text-primary hover:bg-primary-soft">
-                <Link href={`/work-orders/${woId}/invoice`}>
-                  <FileText className="size-4" />
-                  Lihat / Cetak Invoice
-                </Link>
-              </Button>
-            )}
-
-            {/* Tombol Terbitkan Invoice jika status siap_diambil & belum ada invoice */}
-            {bolehTerbitkanInvoice && (
-              <Button
-                onClick={() => setModalTerbitkan(true)}
-                className="bg-primary hover:bg-primary-strong text-white gap-2"
-                disabled={items.length === 0}
-              >
+          {/* Tombol Lihat Invoice jika sudah terbit */}
+          {invoice && (
+            <Button
+              asChild
+              variant="outline"
+              size="sm"
+              className="gap-2 border-primary/50 text-primary hover:bg-primary-soft hover:text-primary"
+            >
+              <Link href={`/work-orders/${woId}/invoice`}>
                 <FileText className="size-4" />
-                Terbitkan Invoice
+                Lihat / Cetak Invoice
+              </Link>
+            </Button>
+          )}
+
+          {/* Tombol Catat Pembayaran jika invoice sudah terbit dan belum lunas */}
+          {bolehCatatPembayaran && (
+            <Button
+              size="sm"
+              onClick={handleBukaBayar}
+              className="gap-2 bg-success text-[#04140A] hover:bg-success/90"
+            >
+              <CreditCard className="size-4" />
+              + Pembayaran
+            </Button>
+          )}
+
+          {/* Tombol Terbitkan Invoice jika status siap_diambil & belum ada invoice */}
+          {bolehTerbitkanInvoice && (
+            <Button
+              onClick={() => setModalTerbitkan(true)}
+              size="sm"
+              className="gap-2 bg-primary text-white hover:bg-primary-strong"
+              disabled={items.length === 0}
+            >
+              <FileText className="size-4" />
+              Terbitkan Invoice
+            </Button>
+          )}
+
+          {/* Tombol Tambah Item jika status dikerjakan */}
+          {bolehKelolaItem && (
+            <>
+              <Button onClick={() => handleBukaTambah("part")} variant="outline" size="sm" className="gap-1.5">
+                <Plus className="size-4" />
+                Spare Part
               </Button>
-            )}
-
-            {/* Tombol Catat Pembayaran jika invoice sudah terbit dan belum lunas */}
-            {bolehCatatPembayaran && (
-              <Button
-                onClick={handleBukaBayar}
-                className="bg-success hover:bg-success/90 text-white gap-2"
-              >
-                <CreditCard className="size-4" />
-                + Pembayaran
+              <Button onClick={() => handleBukaTambah("jasa")} variant="outline" size="sm" className="gap-1.5">
+                <Plus className="size-4" />
+                Jasa
               </Button>
-            )}
+            </>
+          )}
 
-            {/* Tombol Tambah Item jika status dikerjakan */}
-            {bolehKelolaItem && (
-              <>
-                <Button
-                  onClick={() => handleBukaTambah("part")}
-                  variant="outline"
-                  className="gap-1.5"
-                >
-                  <Plus className="size-4" />
-                  Spare Part
-                </Button>
-                <Button
-                  onClick={() => handleBukaTambah("jasa")}
-                  variant="outline"
-                  className="gap-1.5"
-                >
-                  <Plus className="size-4" />
-                  Jasa
-                </Button>
-              </>
-            )}
+          {/* Tombol Atur Diskon jika belum ada invoice */}
+          {bolehKelolaHarga && (
+            <Button onClick={() => setModalDiskon(true)} variant="outline" size="sm" className="gap-1.5">
+              <Percent className="size-4" />
+              Diskon
+            </Button>
+          )}
+        </div>
+      </div>
 
-            {/* Tombol Atur Diskon jika belum ada invoice */}
-            {bolehKelolaHarga && (
-              <Button
-                onClick={() => setModalDiskon(true)}
-                variant="outline"
-                className="gap-1.5"
-              >
-                <Percent className="size-4" />
-                Diskon
-              </Button>
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      {/* Kartu KPI ringkasan tagihan */}
+      <div
+        className={cn(
+          "grid grid-cols-2 gap-3 md:grid-cols-3",
+          isOwner ? "xl:grid-cols-6" : "xl:grid-cols-5",
+        )}
+      >
+        <KartuKpi
+          label="Subtotal"
+          nilai={rupiah(subtotalTagihan)}
+          keterangan={`${items.length} baris tagihan`}
+          ikon={ReceiptText}
+        />
+        <KartuKpi
+          label="Diskon"
+          nilai={nilaiDiskon > 0 ? `- ${rupiah(nilaiDiskon)}` : rupiah(0)}
+          keterangan={nilaiDiskon > 0 ? "Ada potongan" : "Tanpa potongan"}
+          ikon={Percent}
+        />
+        <KartuKpi
+          label="Total Tagihan"
+          nilai={rupiah(totalTagihan)}
+          keterangan={invoice ? invoice.nomor : "Belum diterbitkan"}
+          ikon={Wallet}
+          utama
+        />
+        <KartuKpi
+          label="Sudah Dibayar"
+          nilai={rupiah(totalTerbayar)}
+          keterangan={`${persenTerbayar}% dari total`}
+          ikon={CreditCard}
+        />
+        <KartuKpi
+          label="Sisa Tagihan"
+          nilai={rupiah(sisaTagihan)}
+          keterangan={sisaTagihan === 0 ? "Lunas" : "Belum lunas"}
+          ikon={AlertCircle}
+        />
+        {isOwner && (
+          <KartuKpi
+            label="Laba Kotor"
+            nilai={rupiah(labaKotor)}
+            keterangan={`Margin ${marginPersen.toFixed(1)}%`}
+            ikon={TrendingUp}
+          />
+        )}
+      </div>
 
-      {/* Tabel Baris Tagihan */}
-      <Card className="border-border shadow-xs">
-        <CardHeader className="pb-3 border-b border-border flex flex-row items-center justify-between">
-          <div>
-            <CardTitle className="text-lg font-semibold text-text">Rincian Item Tagihan</CardTitle>
-            <p className="text-xs text-text-muted mt-1">
-              {invoice
-                ? "Tagihan telah dikunci karena invoice sudah diterbitkan."
-                : statusWo === "dikerjakan"
-                ? "Spare part dan jasa dapat ditambahkan atau dihapus oleh Kepala Mekanik."
-                : "Item hanya dapat ditambah/dihapus saat WO berstatus dikerjakan."}
-            </p>
-          </div>
-        </CardHeader>
-        <CardContent className="p-0">
-          <Table>
-            <TableHeader>
-              <TableRow className="bg-muted/40">
-                <TableHead className="w-12 text-center">No</TableHead>
-                <TableHead>Item</TableHead>
-                <TableHead className="w-24">Jenis</TableHead>
-                <TableHead className="text-right w-20">Jumlah</TableHead>
-                <TableHead className="text-right">Harga Master</TableHead>
-                <TableHead className="text-right">Harga Dipakai</TableHead>
-                <TableHead className="text-right">Subtotal</TableHead>
-                {isOwner && (
-                  <>
-                    <TableHead className="text-right text-xs text-text-muted">Modal / Item</TableHead>
-                    <TableHead className="text-right text-xs text-text-muted">Laba Baris</TableHead>
-                  </>
-                )}
-                <TableHead className="w-24 text-center">Aksi</TableHead>
-              </TableRow>
+      {/* Konten utama: rincian item + panel ringkasan */}
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_22rem]">
+        {/* Tabel Baris Tagihan */}
+        <Card className="overflow-hidden border-border shadow-xs">
+          <CardHeader className="flex flex-row items-center justify-between gap-3 border-b border-border pb-3">
+            <div>
+              <CardTitle className="flex items-center gap-2 text-lg font-semibold text-text">
+                <ReceiptText className="size-4 text-primary" />
+                Rincian Item Tagihan
+              </CardTitle>
+              <p className="mt-1 text-xs text-text-muted">
+                {invoice
+                  ? "Tagihan telah dikunci karena invoice sudah diterbitkan."
+                  : statusWo === "dikerjakan"
+                  ? "Spare part dan jasa dapat ditambahkan atau dihapus oleh Kepala Mekanik."
+                  : "Item hanya dapat ditambah/dihapus saat WO berstatus dikerjakan."}
+              </p>
+            </div>
+            <Badge variant="outline" className="shrink-0 border-border text-xs text-text-muted">
+              {items.length} item
+            </Badge>
+          </CardHeader>
+          <CardContent className="p-0">
+            <Table>
+              <TableHeader>
+                <TableRow className="bg-muted/40 hover:bg-muted/40">
+                  <TableHead className="w-12 text-center">No</TableHead>
+                  <TableHead>Item</TableHead>
+                  <TableHead className="w-24">Jenis</TableHead>
+                  <TableHead className="text-right w-20">Jumlah</TableHead>
+                  <TableHead className="text-right">Harga Master</TableHead>
+                  <TableHead className="text-right">Harga Dipakai</TableHead>
+                  <TableHead className="text-right">Subtotal</TableHead>
+                  {isOwner && (
+                    <>
+                      <TableHead className="text-right text-xs text-text-muted">Modal / Item</TableHead>
+                      <TableHead className="text-right text-xs text-text-muted">Laba Baris</TableHead>
+                    </>
+                  )}
+                  <TableHead className="w-24 text-center">Aksi</TableHead>
+                </TableRow>
             </TableHeader>
             <TableBody>
               {items.length === 0 ? (
@@ -580,13 +635,13 @@ export function KomponenTagihan({
                               <TooltipTrigger asChild>
                                 <button
                                   type="button"
-                                  className="text-amber-500 hover:text-amber-600 transition-colors p-0.5"
+                                  className="p-0.5 text-warning transition-colors hover:text-warning/80"
                                   aria-label="Lihat detail penyesuaian harga"
                                 >
                                   <Info className="size-4" />
                                 </button>
                               </TooltipTrigger>
-                              <TooltipContent className="max-w-xs p-2.5 text-xs">
+                              <TooltipContent className="tema-tagihan max-w-xs p-2.5 text-xs">
                                 <p className="font-semibold text-text">Penyesuaian Harga:</p>
                                 <p className="text-text-body mt-0.5">
                                   {it.alasan_penyesuaian || "Tidak ada keterangan"}
@@ -634,7 +689,7 @@ export function KomponenTagihan({
                                   <Pencil className="size-3.5" />
                                 </Button>
                               </TooltipTrigger>
-                              <TooltipContent>Sesuaikan Harga</TooltipContent>
+                              <TooltipContent className="tema-tagihan">Sesuaikan Harga</TooltipContent>
                             </Tooltip>
                           )}
                           {bolehKelolaItem && (
@@ -649,7 +704,7 @@ export function KomponenTagihan({
                                   <Trash2 className="size-3.5" />
                                 </Button>
                               </TooltipTrigger>
-                              <TooltipContent>Hapus Item</TooltipContent>
+                              <TooltipContent className="tema-tagihan">Hapus Item</TooltipContent>
                             </Tooltip>
                           )}
                         </div>
@@ -663,146 +718,246 @@ export function KomponenTagihan({
         </CardContent>
       </Card>
 
-      {/* Rangkuman Biaya & Riwayat Pembayaran */}
-      <div className="grid gap-6 md:grid-cols-2">
-        {/* Riwayat Pembayaran */}
-        <Card className="border-border shadow-xs">
-          <CardHeader className="pb-3 border-b border-border flex flex-row items-center justify-between">
-            <CardTitle className="text-base font-semibold text-text flex items-center gap-2">
+        {/* Panel kanan: ringkasan + status invoice */}
+        <div className="space-y-6">
+          {/* Ringkasan Total Tagihan */}
+          <Card className="border-border bg-card shadow-xs">
+            <CardHeader className="border-b border-border pb-3">
+              <CardTitle className="flex items-center gap-2 text-base font-semibold text-text">
+                <Wallet className="size-4 text-primary" />
+                Ringkasan Tagihan
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-3.5 p-5">
+              <div className="flex justify-between text-sm">
+                <span className="text-text-body">Subtotal</span>
+                <span className="font-medium tabular-nums text-text">{rupiah(subtotalTagihan)}</span>
+              </div>
+
+              <div className="flex items-start justify-between gap-3 text-sm">
+                <div>
+                  <span className="text-text-body">Diskon</span>
+                  {alasanDiskonWo && (
+                    <p className="text-xs italic text-text-muted">Alasan: {alasanDiskonWo}</p>
+                  )}
+                </div>
+                <span className="font-medium tabular-nums text-danger">- {rupiah(nilaiDiskon)}</span>
+              </div>
+
+              <div className="flex justify-between border-t border-border pt-3 text-base font-bold text-text">
+                <span>Total Tagihan</span>
+                <span className="text-lg tabular-nums text-primary">{rupiah(totalTagihan)}</span>
+              </div>
+
+              {invoice && (
+                <>
+                  <div className="flex justify-between pt-1 text-sm text-text-body">
+                    <span>Sudah Dibayar</span>
+                    <span className="font-semibold tabular-nums text-success">{rupiah(totalTerbayar)}</span>
+                  </div>
+                  <div className="flex justify-between border-t border-dashed border-border pt-1 text-sm font-semibold">
+                    <span className="text-text">Sisa Pembayaran</span>
+                    <span
+                      className={cn(
+                        "tabular-nums",
+                        sisaTagihan === 0 ? "text-success" : "text-warning",
+                      )}
+                    >
+                      {rupiah(sisaTagihan)}
+                    </span>
+                  </div>
+
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex justify-between text-xs text-text-muted">
+                      <span>Terbayar</span>
+                      <span className="tabular-nums">{persenTerbayar}%</span>
+                    </div>
+                    <div className="h-2 overflow-hidden rounded-full bg-muted">
+                      <div
+                        className="h-full rounded-full bg-primary transition-all"
+                        style={{ width: `${persenTerbayar}%` }}
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
+
+              {/* Bagian Khusus Owner: Modal & Laba Kotor */}
+              {isOwner && (
+                <div className="mt-4 space-y-1.5 rounded-lg border border-border bg-muted/30 p-3.5">
+                  <p className="text-[11px] font-bold uppercase tracking-wider text-text-muted">
+                    Analisis Keuntungan (Hanya Owner)
+                  </p>
+                  <div className="flex justify-between text-xs text-text-body">
+                    <span>Total Modal Spare Part</span>
+                    <span className="tabular-nums">{rupiah(totalModal)}</span>
+                  </div>
+                  <div className="flex justify-between pt-1 text-sm font-bold">
+                    <span className="text-text">Laba Kotor WO</span>
+                    <span
+                      className={cn(
+                        "tabular-nums",
+                        labaKotor < 0 ? "text-danger" : "text-success",
+                      )}
+                    >
+                      {rupiah(labaKotor)} ({marginPersen.toFixed(1)}%)
+                    </span>
+                  </div>
+                </div>
+              )}
+            </CardContent>
+          </Card>
+
+          {/* Status Invoice & Aksi */}
+          <Card className="border-border shadow-xs">
+            <CardHeader className="border-b border-border pb-3">
+              <CardTitle className="flex items-center gap-2 text-base font-semibold text-text">
+                <FileText className="size-4 text-primary" />
+                Status Invoice
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 p-5">
+              {invoice ? (
+                <>
+                  <div>
+                    <p className="text-xs text-text-muted">Nomor Invoice</p>
+                    <p className="font-mono text-sm font-semibold text-text">{invoice.nomor}</p>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-text-muted">Diterbitkan</span>
+                    <span className="tabular-nums text-text">{tanggal(invoice.diterbitkan_at)}</span>
+                  </div>
+                  <div className="flex items-center justify-between text-sm">
+                    <span className="text-text-muted">Status</span>
+                    <span
+                      className={cn(
+                        "font-semibold",
+                        invoice.status_bayar === "lunas" && "text-success",
+                        invoice.status_bayar === "sebagian" && "text-warning",
+                        invoice.status_bayar === "belum_bayar" && "text-text-muted",
+                      )}
+                    >
+                      {invoice.status_bayar === "lunas"
+                        ? "Lunas"
+                        : invoice.status_bayar === "sebagian"
+                        ? "Dibayar Sebagian"
+                        : "Belum Bayar"}
+                    </span>
+                  </div>
+                  <Button
+                    asChild
+                    variant="outline"
+                    className="w-full gap-2 border-primary/50 text-primary hover:bg-primary-soft hover:text-primary"
+                  >
+                    <Link href={`/work-orders/${woId}/invoice`}>
+                      <FileText className="size-4" />
+                      Lihat / Cetak Invoice
+                    </Link>
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <p className="text-sm text-text-muted">
+                    Invoice belum diterbitkan. Tagihan masih bisa diubah sampai invoice resmi terbit.
+                  </p>
+                  {bolehTerbitkanInvoice ? (
+                    <Button
+                      onClick={() => setModalTerbitkan(true)}
+                      className="w-full gap-2 bg-primary text-white hover:bg-primary-strong"
+                      disabled={items.length === 0}
+                    >
+                      <FileText className="size-4" />
+                      Terbitkan Invoice
+                    </Button>
+                  ) : (
+                    <p className="rounded-lg border border-border bg-muted/40 p-3 text-xs text-text-muted">
+                      Invoice dapat diterbitkan saat WO berstatus{" "}
+                      <span className="font-semibold text-text">Siap Diambil</span> oleh Admin atau
+                      Owner.
+                    </p>
+                  )}
+                </>
+              )}
+
+              {bolehCatatPembayaran && (
+                <Button
+                  onClick={handleBukaBayar}
+                  className="w-full gap-2 bg-success text-[#04140A] hover:bg-success/90"
+                >
+                  <CreditCard className="size-4" />
+                  Catat Pembayaran
+                </Button>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+      </div>
+
+      {/* Riwayat Pembayaran */}
+      <Card className="border-border shadow-xs">
+        <CardHeader className="flex flex-row items-center justify-between gap-3 border-b border-border pb-3">
+          <div>
+            <CardTitle className="flex items-center gap-2 text-base font-semibold text-text">
               <CreditCard className="size-4 text-primary" />
               Riwayat Pembayaran
             </CardTitle>
-            {bolehCatatPembayaran && (
-              <Button
-                size="sm"
-                variant="outline"
-                onClick={handleBukaBayar}
-                className="h-8 gap-1 text-xs"
-              >
-                <Plus className="size-3.5" />
-                Bayar
-              </Button>
-            )}
-          </CardHeader>
-          <CardContent className="p-4">
-            {!invoice ? (
-              <p className="text-sm text-text-muted py-6 text-center">
-                Invoice belum diterbitkan. Pembayaran dapat dicatat setelah invoice resmi terbit.
-              </p>
-            ) : payments.length === 0 ? (
-              <p className="text-sm text-text-muted py-6 text-center">
-                Belum ada transaksi pembayaran untuk invoice ini.
-              </p>
-            ) : (
-              <div className="space-y-3">
-                {payments.map((p) => (
-                  <div
-                    key={p.id}
-                    className="flex items-center justify-between border-b border-border/60 pb-2.5 last:border-0 last:pb-0"
-                  >
-                    <div>
-                      <div className="flex items-center gap-2">
-                        <Badge variant="outline" className="uppercase text-[11px] font-semibold">
-                          {p.metode}
-                        </Badge>
-                        <span className="text-xs text-text-muted">
-                          {tanggal(p.created_at)}
-                        </span>
-                      </div>
-                      <p className="text-xs text-text-muted mt-0.5">
-                        Oleh: {p.nama_pencatat || "Kasir Bengkel"}
-                      </p>
+            <p className="mt-1 text-xs text-text-muted">
+              Pembayaran yang tercatat untuk invoice ini.
+            </p>
+          </div>
+          {bolehCatatPembayaran && (
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={handleBukaBayar}
+              className="h-8 gap-1 border-primary/50 text-xs text-primary hover:bg-primary-soft hover:text-primary"
+            >
+              <Plus className="size-3.5" />
+              Bayar
+            </Button>
+          )}
+        </CardHeader>
+        <CardContent className="p-5">
+          {!invoice ? (
+            <p className="py-6 text-center text-sm text-text-muted">
+              Invoice belum diterbitkan. Pembayaran dapat dicatat setelah invoice resmi terbit.
+            </p>
+          ) : payments.length === 0 ? (
+            <p className="py-6 text-center text-sm text-text-muted">
+              Belum ada transaksi pembayaran untuk invoice ini.
+            </p>
+          ) : (
+            <div className="divide-y divide-border">
+              {payments.map((p) => (
+                <div
+                  key={p.id}
+                  className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0"
+                >
+                  <div>
+                    <div className="flex items-center gap-2">
+                      <Badge
+                        variant="outline"
+                        className="border-border text-[11px] font-semibold uppercase text-text-body"
+                      >
+                        {p.metode}
+                      </Badge>
+                      <span className="text-xs tabular-nums text-text-muted">
+                        {tanggal(p.created_at)}
+                      </span>
                     </div>
-                    <span className="font-semibold text-sm tabular-nums text-success">
-                      + {rupiah(p.jumlah)}
-                    </span>
+                    <p className="mt-0.5 text-xs text-text-muted">
+                      Oleh: {p.nama_pencatat || "Kasir Bengkel"}
+                    </p>
                   </div>
-                ))}
-              </div>
-            )}
-          </CardContent>
-        </Card>
-
-        {/* Ringkasan Total Tagihan */}
-        <Card className="border-border shadow-xs bg-card">
-          <CardHeader className="pb-3 border-b border-border">
-            <CardTitle className="text-base font-semibold text-text">
-              Ringkasan Tagihan
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="p-5 space-y-3.5">
-            <div className="flex justify-between text-sm">
-              <span className="text-text-body">Subtotal</span>
-              <span className="font-medium tabular-nums">{rupiah(subtotalTagihan)}</span>
-            </div>
-
-            <div className="flex justify-between items-start text-sm">
-              <div>
-                <span className="text-text-body">Diskon</span>
-                {alasanDiskonWo && (
-                  <p className="text-xs text-text-muted italic">
-                    Alasan: {alasanDiskonWo}
-                  </p>
-                )}
-              </div>
-              <span className="font-medium tabular-nums text-danger">
-                - {rupiah(nilaiDiskon)}
-              </span>
-            </div>
-
-            <div className="border-t border-border pt-3 flex justify-between text-base font-bold text-text">
-              <span>Total Tagihan</span>
-              <span className="tabular-nums text-primary text-lg">
-                {rupiah(totalTagihan)}
-              </span>
-            </div>
-
-            {invoice && (
-              <>
-                <div className="flex justify-between text-sm text-text-body pt-1">
-                  <span>Sudah Dibayar</span>
-                  <span className="font-semibold text-success tabular-nums">
-                    {rupiah(totalTerbayar)}
+                  <span className="text-sm font-semibold tabular-nums text-success">
+                    + {rupiah(p.jumlah)}
                   </span>
                 </div>
-                <div className="flex justify-between text-sm font-semibold pt-1 border-t border-dashed border-border">
-                  <span className="text-text">Sisa Pembayaran</span>
-                  <span
-                    className={`tabular-nums ${
-                      sisaTagihan === 0 ? "text-success" : "text-amber-600"
-                    }`}
-                  >
-                    {rupiah(sisaTagihan)}
-                  </span>
-                </div>
-              </>
-            )}
-
-            {/* Bagian Khusus Owner: Modal & Laba Kotor */}
-            {isOwner && (
-              <div className="mt-4 border-t border-border/80 pt-3.5 bg-muted/30 -mx-5 -mb-5 p-4 rounded-b-xl space-y-1.5">
-                <p className="text-xs font-bold uppercase tracking-wider text-text-muted">
-                  Analisis Keuntungan (Hanya Owner)
-                </p>
-                <div className="flex justify-between text-xs text-text-body">
-                  <span>Total Modal Spare Part</span>
-                  <span className="tabular-nums">{rupiah(totalModal)}</span>
-                </div>
-                <div className="flex justify-between text-sm font-bold pt-1">
-                  <span className="text-text">Laba Kotor WO</span>
-                  <span
-                    className={`tabular-nums ${
-                      labaKotor < 0 ? "text-danger" : "text-success"
-                    }`}
-                  >
-                    {rupiah(labaKotor)} ({marginPersen.toFixed(1)}%)
-                  </span>
-                </div>
-              </div>
-            )}
-          </CardContent>
-        </Card>
-      </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
 
       {/* ========================================================================= */}
       {/* DIALOG-DIALOG FITUR B */}
@@ -810,7 +965,7 @@ export function KomponenTagihan({
 
       {/* 1. Modal Tambah Spare Part / Jasa */}
       <Dialog open={modalTambah !== null} onOpenChange={() => setModalTambah(null)}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="tema-tagihan sm:max-w-md">
           <DialogHeader>
             <DialogTitle>
               Tambah {modalTambah === "part" ? "Spare Part" : "Jasa"}
@@ -827,7 +982,7 @@ export function KomponenTagihan({
                 <SelectTrigger id="item-select" className="w-full">
                   <SelectValue placeholder={`Pilih ${modalTambah === "part" ? "spare part" : "jasa"}...`} />
                 </SelectTrigger>
-                <SelectContent className="max-h-64">
+                <SelectContent className="tema-tagihan max-h-64">
                   {itemPilihanOptions.map((opt) => (
                     <SelectItem key={opt.id} value={opt.id}>
                       {opt.nama} · {rupiah(opt.harga_jual)}{" "}
@@ -869,7 +1024,7 @@ export function KomponenTagihan({
 
       {/* 2. Modal Konfirmasi Hapus Item */}
       <Dialog open={itemHapus !== null} onOpenChange={() => setItemHapus(null)}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="tema-tagihan sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Hapus Item Tagihan</DialogTitle>
             <DialogDescription>
@@ -903,7 +1058,7 @@ export function KomponenTagihan({
 
       {/* 3. Modal Sesuaikan Harga Item */}
       <Dialog open={itemSesuaikan !== null} onOpenChange={() => setItemSesuaikan(null)}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="tema-tagihan sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Sesuaikan Harga Item</DialogTitle>
             <DialogDescription>
@@ -938,7 +1093,7 @@ export function KomponenTagihan({
                 <SelectTrigger id="pilihan-alasan" className="w-full">
                   <SelectValue placeholder="Pilih alasan..." />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="tema-tagihan">
                   {ALASAN_PENYESUAIAN_OPTIONS.map((al) => (
                     <SelectItem key={al} value={al}>
                       {al}
@@ -980,7 +1135,7 @@ export function KomponenTagihan({
 
       {/* 4. Modal Atur Diskon */}
       <Dialog open={modalDiskon} onOpenChange={setModalDiskon}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="tema-tagihan sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Atur Diskon Total</DialogTitle>
             <DialogDescription>
@@ -1032,7 +1187,7 @@ export function KomponenTagihan({
 
       {/* 5. Modal Konfirmasi Terbitkan Invoice */}
       <Dialog open={modalTerbitkan} onOpenChange={setModalTerbitkan}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="tema-tagihan sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Terbitkan Invoice Resmi</DialogTitle>
             <DialogDescription>
@@ -1067,7 +1222,7 @@ export function KomponenTagihan({
 
       {/* 6. Modal Catat Pembayaran */}
       <Dialog open={modalBayar} onOpenChange={setModalBayar}>
-        <DialogContent className="sm:max-w-md">
+        <DialogContent className="tema-tagihan sm:max-w-md">
           <DialogHeader>
             <DialogTitle>Catat Pembayaran</DialogTitle>
             <DialogDescription>
@@ -1078,7 +1233,7 @@ export function KomponenTagihan({
           <form onSubmit={handleSimpanBayar} className="space-y-4">
             <div className="bg-muted/40 p-3 rounded-lg flex justify-between items-center text-sm">
               <span className="text-text-muted">Sisa Tagihan:</span>
-              <span className="font-bold text-amber-600 tabular-nums">
+              <span className="font-bold text-warning tabular-nums">
                 {rupiah(sisaTagihan)}
               </span>
             </div>
@@ -1092,7 +1247,7 @@ export function KomponenTagihan({
                 <SelectTrigger id="metode-pembayaran" className="w-full">
                   <SelectValue placeholder="Pilih metode..." />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="tema-tagihan">
                   <SelectItem value="tunai">Tunai (Cash)</SelectItem>
                   <SelectItem value="transfer">Transfer Bank</SelectItem>
                   <SelectItem value="qris">QRIS</SelectItem>
@@ -1133,7 +1288,7 @@ export function KomponenTagihan({
               </Button>
               <Button
                 type="submit"
-                className="bg-success hover:bg-success/90 text-white"
+                className="bg-success text-[#04140A] hover:bg-success/90"
                 disabled={isPending}
               >
                 {isPending ? "Memproses..." : "Simpan Pembayaran"}
@@ -1142,6 +1297,44 @@ export function KomponenTagihan({
           </form>
         </DialogContent>
       </Dialog>
+    </div>
+  );
+}
+
+/** Kartu angka ringkas di bagian atas halaman tagihan. */
+function KartuKpi({
+  label,
+  nilai,
+  keterangan,
+  ikon: Ikon,
+  utama = false,
+}: {
+  label: string;
+  nilai: string;
+  keterangan?: string;
+  ikon: LucideIcon;
+  utama?: boolean;
+}) {
+  return (
+    <div
+      className={cn(
+        "rounded-xl border border-border bg-card p-4 transition-colors",
+        utama && "border-primary/40 bg-primary-soft/40",
+      )}
+    >
+      <div className="flex items-center justify-between gap-2">
+        <span className="text-xs font-medium text-text-muted">{label}</span>
+        <Ikon className={cn("size-4", utama ? "text-primary" : "text-text-muted")} />
+      </div>
+      <p
+        className={cn(
+          "mt-2 text-lg font-bold tabular-nums tracking-tight text-text",
+          utama && "text-primary",
+        )}
+      >
+        {nilai}
+      </p>
+      {keterangan && <p className="mt-0.5 truncate text-[11px] text-text-muted">{keterangan}</p>}
     </div>
   );
 }
