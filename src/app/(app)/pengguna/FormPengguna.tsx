@@ -99,105 +99,142 @@ export function FormPengguna({
   }
 
   return (
-    <Dialog
-      open={buka}
-      onOpenChange={(v) => {
-        setBuka(v);
-        if (!v) {
-          form.reset({
-            nama: target.nama,
-            role: (target.role as Peran) || "kepala_mekanik",
-            aktif: target.aktif,
-          });
-        }
-      }}
-    >
+    <Dialog open={buka} onOpenChange={setBuka}>
       <DialogTrigger asChild>
-        <Button variant="outline" size="sm" className="h-8 gap-1.5 text-xs">
+        <Button
+          variant="outline"
+          size="sm"
+          className="h-8 gap-1.5 text-xs border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:bg-zinc-800 hover:text-white hover:border-primary/40"
+        >
           <Pencil className="size-3.5" />
-          Kelola
+          Ubah
         </Button>
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="bg-[#111116] border border-zinc-800 text-white sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Kelola Akun Pengguna</DialogTitle>
+          <DialogTitle className="text-white text-base font-semibold">
+            Ubah Pengguna
+          </DialogTitle>
         </DialogHeader>
-        <div className="mb-2 rounded-lg bg-bg-app p-3 text-xs text-text-muted">
-          <p className="font-mono text-text">{target.email}</p>
-        </div>
-        <form id={`form-pengguna-${target.id}`} onSubmit={form.handleSubmit(simpan)} noValidate>
+        <form
+          id={`form-pengguna-${target.id}`}
+          onSubmit={form.handleSubmit(simpan)}
+          noValidate
+        >
           <FieldGroup className="gap-4">
+            {/* Email (Read-only) */}
+            <Field>
+              <FieldLabel className="text-zinc-400 text-xs font-medium">Email</FieldLabel>
+              <Input
+                value={target.email}
+                disabled
+                className="border-zinc-800/80 bg-zinc-900/40 text-zinc-400 font-mono text-xs cursor-not-allowed opacity-80"
+              />
+            </Field>
+
+            {/* Nama */}
             <Controller
               name="nama"
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor={`nama-${target.id}`}>Nama Lengkap *</FieldLabel>
-                  <Input {...field} id={`nama-${target.id}`} aria-invalid={fieldState.invalid} />
+                  <FieldLabel
+                    htmlFor={`nama-${target.id}`}
+                    className="text-zinc-300 text-xs font-medium"
+                  >
+                    Nama Lengkap *
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id={`nama-${target.id}`}
+                    placeholder="Nama pengguna"
+                    aria-invalid={fieldState.invalid}
+                    className="border-zinc-800 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:border-primary/50 text-xs"
+                  />
                   <FieldError errors={[fieldState.error]} />
                 </Field>
               )}
             />
 
+            {/* Peran */}
             <Controller
               name="role"
               control={form.control}
               render={({ field }) => (
                 <Field>
-                  <FieldLabel htmlFor={`role-${target.id}`}>Peran Akun *</FieldLabel>
+                  <FieldLabel
+                    htmlFor={`role-${target.id}`}
+                    className="text-zinc-300 text-xs font-medium"
+                  >
+                    Peran *
+                  </FieldLabel>
                   <Select
                     value={field.value}
                     onValueChange={field.onChange}
                     disabled={isSelf && target.role === "owner"}
                   >
-                    <SelectTrigger id={`role-${target.id}`} className="w-full">
-                      <SelectValue />
+                    <SelectTrigger
+                      id={`role-${target.id}`}
+                      className="border-zinc-800 bg-zinc-900 text-white text-xs"
+                    >
+                      <SelectValue placeholder="Pilih peran" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="owner">{LABEL_PERAN.owner}</SelectItem>
-                      <SelectItem value="admin">{LABEL_PERAN.admin}</SelectItem>
-                      <SelectItem value="kepala_mekanik">{LABEL_PERAN.kepala_mekanik}</SelectItem>
+                    <SelectContent className="bg-[#111116] border-zinc-800 text-white">
+                      {PERAN.map((p) => (
+                        <SelectItem key={p} value={p} className="focus:bg-zinc-800 focus:text-white">
+                          {LABEL_PERAN[p]}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   {isSelf && target.role === "owner" && (
-                    <p className="text-xs text-text-muted mt-1">Peran akun Anda sendiri terkunci sebagai Owner.</p>
+                    <p className="mt-1 text-[11px] text-zinc-500 italic">
+                      Anda tidak dapat mengubah peran akun Anda sendiri.
+                    </p>
                   )}
                 </Field>
               )}
             />
 
+            {/* Status Aktif */}
             <Controller
               name="aktif"
               control={form.control}
               render={({ field }) => (
-                <div className="flex items-center gap-3 pt-2">
-                  <Checkbox
-                    id={`aktif-${target.id}`}
-                    checked={field.value}
-                    onCheckedChange={(checked) => field.onChange(Boolean(checked))}
-                    disabled={isSelf}
-                  />
-                  <div className="grid gap-0.5 leading-none">
-                    <label
-                      htmlFor={`aktif-${target.id}`}
-                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 text-text"
-                    >
-                      Status Akun Aktif
-                    </label>
-                    <p className="text-xs text-text-muted">
-                      Akun nonaktif tidak dapat masuk ke dalam sistem.
-                    </p>
+                <Field>
+                  <div className="flex items-start gap-2.5 rounded-lg border border-zinc-800 bg-zinc-900/60 p-3">
+                    <Checkbox
+                      id={`aktif-${target.id}`}
+                      checked={field.value}
+                      onCheckedChange={(checked) => field.onChange(Boolean(checked))}
+                      disabled={isSelf}
+                      className="border-zinc-700 data-[state=checked]:bg-primary data-[state=checked]:border-primary"
+                    />
+                    <div className="grid gap-0.5 leading-none">
+                      <label
+                        htmlFor={`aktif-${target.id}`}
+                        className="text-xs font-medium text-white cursor-pointer select-none"
+                      >
+                        Akun Aktif
+                      </label>
+                      <p className="text-[11px] text-zinc-400">
+                        {isSelf
+                          ? "Anda tidak dapat menonaktifkan akun sendiri."
+                          : "Jika dinonaktifkan, pengguna tidak dapat masuk ke sistem."}
+                      </p>
+                    </div>
                   </div>
-                </div>
+                </Field>
               )}
             />
           </FieldGroup>
         </form>
-        <DialogFooter>
+        <DialogFooter className="gap-2 sm:gap-0">
           <Button
             type="submit"
             form={`form-pengguna-${target.id}`}
             disabled={form.formState.isSubmitting}
+            className="bg-primary hover:bg-primary-strong text-white font-medium text-xs shadow-xs"
           >
             {form.formState.isSubmitting ? "Menyimpan..." : "Simpan Perubahan"}
           </Button>

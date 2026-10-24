@@ -109,19 +109,26 @@ export function FormKendaraan({ customerId, kendaraan }: { customerId: string; k
     >
       <DialogTrigger asChild>
         {kendaraan ? (
-          <Button variant="ghost" size="icon-sm" aria-label={`Ubah ${kendaraan.plat}`}>
-            <Pencil />
+          <Button
+            variant="ghost"
+            size="icon-sm"
+            aria-label={`Ubah ${kendaraan.plat}`}
+            className="size-7 text-zinc-400 hover:text-white hover:bg-zinc-800"
+          >
+            <Pencil className="size-3.5" />
           </Button>
         ) : (
-          <Button size="sm">
-            <Plus />
-            Kendaraan
+          <Button size="sm" className="gap-1.5 bg-primary hover:bg-primary-strong text-white font-medium text-xs shadow-xs">
+            <Plus className="size-3.5" />
+            Tambah Kendaraan
           </Button>
         )}
       </DialogTrigger>
-      <DialogContent>
+      <DialogContent className="bg-[#111116] border border-zinc-800 text-white sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>{kendaraan ? "Ubah Kendaraan" : "Tambah Kendaraan"}</DialogTitle>
+          <DialogTitle className="text-white text-base font-semibold">
+            {kendaraan ? "Ubah Data Kendaraan" : "Tambah Kendaraan Baru"}
+          </DialogTitle>
         </DialogHeader>
         <form id="form-kendaraan" onSubmit={form.handleSubmit(simpan)} noValidate>
           <FieldGroup className="gap-4">
@@ -130,8 +137,16 @@ export function FormKendaraan({ customerId, kendaraan }: { customerId: string; k
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="plat">Plat Nomor *</FieldLabel>
-                  <Input {...field} id="plat" placeholder="B 1234 ABC" className="uppercase" aria-invalid={fieldState.invalid} />
+                  <FieldLabel htmlFor="plat" className="text-zinc-300 text-xs font-medium">
+                    Plat Nomor *
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="plat"
+                    placeholder="B 1234 ABC"
+                    className="border-zinc-800 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:border-primary/50 text-xs font-mono uppercase tracking-wider"
+                    aria-invalid={fieldState.invalid}
+                  />
                   <FieldError errors={[fieldState.error]} />
                 </Field>
               )}
@@ -141,8 +156,16 @@ export function FormKendaraan({ customerId, kendaraan }: { customerId: string; k
               control={form.control}
               render={({ field, fieldState }) => (
                 <Field data-invalid={fieldState.invalid}>
-                  <FieldLabel htmlFor="merek_model">Merek dan Model *</FieldLabel>
-                  <Input {...field} id="merek_model" placeholder="Toyota Avanza" aria-invalid={fieldState.invalid} />
+                  <FieldLabel htmlFor="merek_model" className="text-zinc-300 text-xs font-medium">
+                    Merek dan Model *
+                  </FieldLabel>
+                  <Input
+                    {...field}
+                    id="merek_model"
+                    placeholder="Toyota Avanza 1.3 G"
+                    aria-invalid={fieldState.invalid}
+                    className="border-zinc-800 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:border-primary/50 text-xs"
+                  />
                   <FieldError errors={[fieldState.error]} />
                 </Field>
               )}
@@ -153,8 +176,17 @@ export function FormKendaraan({ customerId, kendaraan }: { customerId: string; k
                 control={form.control}
                 render={({ field, fieldState }) => (
                   <Field data-invalid={fieldState.invalid}>
-                    <FieldLabel htmlFor="tahun">Tahun</FieldLabel>
-                    <Input {...field} id="tahun" inputMode="numeric" aria-invalid={fieldState.invalid} />
+                    <FieldLabel htmlFor="tahun" className="text-zinc-300 text-xs font-medium">
+                      Tahun Pembuatan
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id="tahun"
+                      inputMode="numeric"
+                      placeholder="2020"
+                      aria-invalid={fieldState.invalid}
+                      className="border-zinc-800 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:border-primary/50 text-xs font-mono"
+                    />
                     <FieldError errors={[fieldState.error]} />
                   </Field>
                 )}
@@ -164,8 +196,15 @@ export function FormKendaraan({ customerId, kendaraan }: { customerId: string; k
                 control={form.control}
                 render={({ field }) => (
                   <Field>
-                    <FieldLabel htmlFor="warna">Warna</FieldLabel>
-                    <Input {...field} id="warna" />
+                    <FieldLabel htmlFor="warna" className="text-zinc-300 text-xs font-medium">
+                      Warna
+                    </FieldLabel>
+                    <Input
+                      {...field}
+                      id="warna"
+                      placeholder="Hitam Metalik"
+                      className="border-zinc-800 bg-zinc-900 text-white placeholder:text-zinc-500 focus-visible:border-primary/50 text-xs"
+                    />
                   </Field>
                 )}
               />
@@ -175,14 +214,16 @@ export function FormKendaraan({ customerId, kendaraan }: { customerId: string; k
               control={form.control}
               render={({ field }) => (
                 <Field>
-                  <FieldLabel htmlFor="transmisi">Transmisi</FieldLabel>
+                  <FieldLabel htmlFor="transmisi" className="text-zinc-300 text-xs font-medium">
+                    Transmisi
+                  </FieldLabel>
                   <Select value={field.value} onValueChange={field.onChange}>
-                    <SelectTrigger id="transmisi" className="w-full">
-                      <SelectValue placeholder="Pilih transmisi" />
+                    <SelectTrigger id="transmisi" className="w-full border-zinc-800 bg-zinc-900 text-white text-xs">
+                      <SelectValue placeholder="Pilih jenis transmisi" />
                     </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="AT">AT (otomatis)</SelectItem>
-                      <SelectItem value="MT">MT (manual)</SelectItem>
+                    <SelectContent className="border-zinc-800 bg-[#111116] text-white">
+                      <SelectItem value="AT" className="text-xs focus:bg-zinc-800 focus:text-white">AT (Otomatis)</SelectItem>
+                      <SelectItem value="MT" className="text-xs focus:bg-zinc-800 focus:text-white">MT (Manual)</SelectItem>
                     </SelectContent>
                   </Select>
                 </Field>
@@ -190,9 +231,14 @@ export function FormKendaraan({ customerId, kendaraan }: { customerId: string; k
             />
           </FieldGroup>
         </form>
-        <DialogFooter>
-          <Button type="submit" form="form-kendaraan" disabled={form.formState.isSubmitting}>
-            {form.formState.isSubmitting ? "Menyimpan..." : "Simpan"}
+        <DialogFooter className="gap-2 sm:gap-0">
+          <Button
+            type="submit"
+            form="form-kendaraan"
+            disabled={form.formState.isSubmitting}
+            className="bg-primary hover:bg-primary-strong text-white font-medium text-xs shadow-xs"
+          >
+            {form.formState.isSubmitting ? "Menyimpan..." : "Simpan Kendaraan"}
           </Button>
         </DialogFooter>
       </DialogContent>

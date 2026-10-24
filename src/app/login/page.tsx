@@ -1,4 +1,3 @@
-import { Wrench } from "lucide-react";
 import { FormLogin } from "./FormLogin";
 
 export default async function HalamanLogin({
@@ -19,12 +18,17 @@ export default async function HalamanLogin({
   return (
     <main className="flex min-h-dvh items-center justify-center p-4">
       <div className="w-full max-w-sm space-y-6">
-        <div className="flex flex-col items-center gap-2 text-center">
-          <div className="flex size-12 items-center justify-center rounded-xl bg-primary text-primary-foreground">
-            <Wrench className="size-6" />
+        <div className="flex flex-col items-center gap-3 text-center">
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src="/logo.png?v=2"
+            alt="Logo Cemerlang Jaya Motor"
+            className="size-16 object-contain drop-shadow"
+          />
+          <div>
+            <h1 className="text-xl font-bold tracking-tight">Cemerlang Jaya Motor</h1>
+            <p className="text-xs text-muted-foreground mt-0.5">Masuk untuk mengelola bengkel</p>
           </div>
-          <h1 className="text-xl font-semibold">Cemerlang Jaya Motor</h1>
-          <p className="text-sm text-muted-foreground">Masuk untuk mengelola bengkel</p>
         </div>
         <FormLogin
           tujuan={tujuan}

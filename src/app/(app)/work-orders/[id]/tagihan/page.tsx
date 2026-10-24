@@ -48,15 +48,13 @@ export default async function TagihanWorkOrder({
   // PRD 4 & 10.2: Kepala Mekanik hanya boleh melihat WO timnya
   if (profil.peran === "kepala_mekanik" && wo.kepala_mekanik_id !== profil.id) {
     return (
-      <div className="tema-tagihan -m-4 min-h-dvh bg-background p-4 text-foreground md:-m-8 md:p-8">
-        <div className="mx-auto max-w-[1400px] space-y-6">
-          <TabWorkOrder id={id} />
-          <div className="rounded-xl border border-warning/40 bg-warning/10 p-6 text-center text-text">
-            <h2 className="text-lg font-semibold">Akses Terbatas</h2>
-            <p className="mt-1 text-sm text-text-muted">
-              Work Order ini ditangani oleh tim lain. Anda hanya dapat melihat dan mengelola tagihan WO milik tim Anda.
-            </p>
-          </div>
+      <div className="space-y-6">
+        <TabWorkOrder id={id} />
+        <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-6 text-center text-zinc-200">
+          <h2 className="text-base font-semibold font-mono text-amber-400 uppercase tracking-wider">Akses Terbatas</h2>
+          <p className="mt-1 text-xs text-zinc-400">
+            Work Order ini ditangani oleh tim lain. Anda hanya dapat melihat dan mengelola tagihan WO milik tim Anda.
+          </p>
         </div>
       </div>
     );
@@ -98,7 +96,6 @@ export default async function TagihanWorkOrder({
   }
 
   const items: ItemTagihan[] = (rawItems ?? []).map((it) => {
-    // Supabase relation query mapping
     const pengubah = it.pengubah as unknown as { nama: string } | null;
     return {
       id: it.id,
@@ -192,27 +189,25 @@ export default async function TagihanWorkOrder({
   const pelanggan = wo.customers as unknown as { nama: string; telepon: string } | null;
 
   return (
-    <div className="tema-tagihan -m-4 min-h-dvh bg-background p-4 text-foreground md:-m-8 md:p-8">
-      <div className="mx-auto max-w-[1400px] space-y-6">
-        <TabWorkOrder id={id} />
+    <div className="space-y-6 pb-16">
+      <TabWorkOrder id={id} />
 
-        <KomponenTagihan
-          woId={wo.id}
-          nomorWo={wo.nomor}
-          statusWo={wo.status}
-          diskonWo={Number(wo.diskon)}
-          alasanDiskonWo={wo.alasan_diskon}
-          kepalaMekanikId={wo.kepala_mekanik_id}
-          platKendaraan={kendaraan?.plat ?? "-"}
-          merekModel={kendaraan?.merek_model ?? "-"}
-          namaPelanggan={pelanggan?.nama ?? "-"}
-          profil={profil}
-          items={items}
-          invoice={invoice}
-          payments={payments}
-          inventoryItems={inventoryItems}
-        />
-      </div>
+      <KomponenTagihan
+        woId={wo.id}
+        nomorWo={wo.nomor}
+        statusWo={wo.status}
+        diskonWo={Number(wo.diskon)}
+        alasanDiskonWo={wo.alasan_diskon}
+        kepalaMekanikId={wo.kepala_mekanik_id}
+        platKendaraan={kendaraan?.plat ?? "-"}
+        merekModel={kendaraan?.merek_model ?? "-"}
+        namaPelanggan={pelanggan?.nama ?? "-"}
+        profil={profil}
+        items={items}
+        invoice={invoice}
+        payments={payments}
+        inventoryItems={inventoryItems}
+      />
     </div>
   );
 }

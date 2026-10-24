@@ -75,7 +75,7 @@ export function GaleriFotoWO({
       const pathFoto = `${woId}/pengerjaan/${idFoto}.webp`;
       const pathThumb = `${woId}/pengerjaan/thumb/${idFoto}.webp`;
 
-      const [resOri, resThumb] = await Promise.all([
+      const [resOri] = await Promise.all([
         supabase.storage.from("foto-wo").upload(pathFoto, fotoWebp, { contentType: "image/webp" }),
         supabase.storage.from("foto-wo").upload(pathThumb, thumbWebp, { contentType: "image/webp" }),
       ]);
@@ -94,6 +94,7 @@ export function GaleriFotoWO({
       setFilePengerjaan(null);
       setPreviewUnggah(null);
       router.refresh();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       toast.error(err?.message || "Gagal mengunggah foto pengerjaan");
     } finally {
@@ -104,9 +105,9 @@ export function GaleriFotoWO({
   return (
     <div className="space-y-6">
       {/* 1. Foto Masuk: STNK & Kondisi Awal */}
-      <div className="space-y-4">
-        <h4 className="text-sm font-semibold text-text flex items-center gap-2">
-          <ImageIcon className="size-4 text-primary" />
+      <div className="space-y-3">
+        <h4 className="text-xs font-semibold text-zinc-300 font-mono uppercase tracking-wider flex items-center gap-2">
+          <ImageIcon className="size-4 text-[#FF2E75]" />
           Dokumentasi Masuk (STNK & Kondisi Awal)
         </h4>
 
@@ -114,21 +115,22 @@ export function GaleriFotoWO({
           {/* STNK */}
           {fotoStnk && (
             <div className="space-y-1">
-              <span className="text-[11px] font-medium text-muted-foreground">Foto STNK:</span>
+              <span className="text-[10px] font-mono uppercase text-zinc-400">Foto STNK:</span>
               <div
                 onClick={() => {
                   setPreviewFoto(fotoStnk.urlOriginal);
                   setJudulPreview("Foto STNK Kendaraan");
                 }}
-                className="relative aspect-video rounded-lg border overflow-hidden cursor-pointer group bg-muted/30"
+                className="relative aspect-video rounded-lg border border-zinc-800 overflow-hidden cursor-pointer group bg-zinc-900/80 shadow-inner"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={fotoStnk.urlThumb || fotoStnk.urlOriginal}
                   alt="Foto STNK"
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  className="size-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                  <Maximize2 className="size-4" />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                  <Maximize2 className="size-4 text-[#FF2E75]" />
                 </div>
               </div>
             </div>
@@ -137,21 +139,22 @@ export function GaleriFotoWO({
           {/* Kondisi Awal */}
           {fotoKondisiAwal.map((f, idx) => (
             <div key={f.id} className="space-y-1">
-              <span className="text-[11px] font-medium text-muted-foreground">Awal #{idx + 1}:</span>
+              <span className="text-[10px] font-mono uppercase text-zinc-400">Awal #{idx + 1}:</span>
               <div
                 onClick={() => {
                   setPreviewFoto(f.urlOriginal);
                   setJudulPreview(`Foto Kondisi Awal #${idx + 1}`);
                 }}
-                className="relative aspect-video rounded-lg border overflow-hidden cursor-pointer group bg-muted/30"
+                className="relative aspect-video rounded-lg border border-zinc-800 overflow-hidden cursor-pointer group bg-zinc-900/80 shadow-inner"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={f.urlThumb || f.urlOriginal}
                   alt={`Kondisi Awal ${idx + 1}`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  className="size-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                  <Maximize2 className="size-4" />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                  <Maximize2 className="size-4 text-[#FF2E75]" />
                 </div>
               </div>
             </div>
@@ -160,19 +163,26 @@ export function GaleriFotoWO({
       </div>
 
       {/* 2. Foto Pengerjaan */}
-      <div className="space-y-3 pt-3 border-t border-border">
+      <div className="space-y-3 pt-3 border-t border-zinc-800/80">
         <div className="flex items-center justify-between">
-          <h4 className="text-sm font-semibold text-text">Foto Proses Pengerjaan ({fotoPengerjaan.length}):</h4>
+          <h4 className="text-xs font-semibold text-zinc-300 font-mono uppercase tracking-wider">
+            Foto Proses Pengerjaan ({fotoPengerjaan.length}):
+          </h4>
           {bolehUnggahPengerjaan && (
-            <Button size="sm" variant="outline" onClick={() => setDialogUnggah(true)}>
-              <Plus className="size-3.5" />
+            <Button
+              size="sm"
+              variant="outline"
+              onClick={() => setDialogUnggah(true)}
+              className="border-zinc-800 bg-zinc-900/70 hover:bg-zinc-800 text-zinc-200 hover:text-white text-xs gap-1.5"
+            >
+              <Plus className="size-3.5 text-[#FF2E75]" />
               Unggah Foto Pengerjaan
             </Button>
           )}
         </div>
 
         {fotoPengerjaan.length === 0 ? (
-          <p className="text-xs text-muted-foreground italic">Belum ada foto proses pengerjaan.</p>
+          <p className="text-xs text-zinc-500 font-mono italic">Belum ada foto proses pengerjaan.</p>
         ) : (
           <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
             {fotoPengerjaan.map((f, idx) => (
@@ -182,15 +192,16 @@ export function GaleriFotoWO({
                   setPreviewFoto(f.urlOriginal);
                   setJudulPreview(`Foto Pengerjaan #${idx + 1}`);
                 }}
-                className="relative aspect-video rounded-lg border overflow-hidden cursor-pointer group bg-muted/30"
+                className="relative aspect-video rounded-lg border border-zinc-800 overflow-hidden cursor-pointer group bg-zinc-900/80 shadow-inner"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={f.urlThumb || f.urlOriginal}
                   alt={`Pengerjaan ${idx + 1}`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  className="size-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                  <Maximize2 className="size-4" />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                  <Maximize2 className="size-4 text-[#FF2E75]" />
                 </div>
               </div>
             ))}
@@ -200,8 +211,10 @@ export function GaleriFotoWO({
 
       {/* 3. Foto Kondisi Akhir */}
       {fotoKondisiAkhir.length > 0 && (
-        <div className="space-y-3 pt-3 border-t border-border">
-          <h4 className="text-sm font-semibold text-text">Foto Kondisi Akhir Penyerahan ({fotoKondisiAkhir.length}):</h4>
+        <div className="space-y-3 pt-3 border-t border-zinc-800/80">
+          <h4 className="text-xs font-semibold text-zinc-300 font-mono uppercase tracking-wider">
+            Foto Kondisi Akhir Penyerahan ({fotoKondisiAkhir.length}):
+          </h4>
           <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 gap-3">
             {fotoKondisiAkhir.map((f, idx) => (
               <div
@@ -210,15 +223,16 @@ export function GaleriFotoWO({
                   setPreviewFoto(f.urlOriginal);
                   setJudulPreview(`Foto Kondisi Akhir #${idx + 1}`);
                 }}
-                className="relative aspect-video rounded-lg border overflow-hidden cursor-pointer group bg-muted/30"
+                className="relative aspect-video rounded-lg border border-zinc-800 overflow-hidden cursor-pointer group bg-zinc-900/80 shadow-inner"
               >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={f.urlThumb || f.urlOriginal}
                   alt={`Kondisi Akhir ${idx + 1}`}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                  className="size-full object-cover group-hover:scale-105 transition-transform duration-300"
                 />
-                <div className="absolute inset-0 bg-black/30 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
-                  <Maximize2 className="size-4" />
+                <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center text-white">
+                  <Maximize2 className="size-4 text-[#FF2E75]" />
                 </div>
               </div>
             ))}
@@ -228,12 +242,13 @@ export function GaleriFotoWO({
 
       {/* Modal Dialog Preview Ukuran Penuh */}
       <Dialog open={Boolean(previewFoto)} onOpenChange={() => setPreviewFoto(null)}>
-        <DialogContent className="max-w-3xl p-3">
+        <DialogContent className="max-w-3xl p-3 bg-[#111116] border-zinc-800 text-zinc-100">
           <DialogHeader className="px-2 pt-1">
-            <DialogTitle className="text-sm font-medium">{judulPreview}</DialogTitle>
+            <DialogTitle className="text-sm font-mono text-white">{judulPreview}</DialogTitle>
           </DialogHeader>
           {previewFoto && (
-            <div className="mt-2 rounded-lg overflow-hidden bg-black/90 flex items-center justify-center max-h-[75vh]">
+            <div className="mt-2 rounded-lg overflow-hidden bg-black/95 flex items-center justify-center max-h-[75vh]">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={previewFoto} alt="Preview Foto" className="max-h-[75vh] w-auto object-contain" />
             </div>
           )}
@@ -242,30 +257,33 @@ export function GaleriFotoWO({
 
       {/* Modal Dialog Unggah Foto Pengerjaan */}
       <Dialog open={dialogUnggah} onOpenChange={setDialogUnggah}>
-        <DialogContent className="max-w-md">
+        <DialogContent className="max-w-md bg-[#111116] border-zinc-800 text-zinc-100">
           <DialogHeader>
-            <DialogTitle>Unggah Foto Pengerjaan</DialogTitle>
+            <DialogTitle className="text-white font-semibold font-mono text-base">
+              Unggah Foto Pengerjaan
+            </DialogTitle>
           </DialogHeader>
           <div className="space-y-4 py-2">
             {previewUnggah ? (
-              <div className="relative aspect-video rounded-lg border overflow-hidden">
-                <img src={previewUnggah} alt="Preview" className="w-full h-full object-cover" />
+              <div className="relative aspect-video rounded-lg border border-zinc-800 overflow-hidden bg-zinc-900">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={previewUnggah} alt="Preview" className="size-full object-cover" />
                 <button
                   type="button"
                   onClick={() => {
                     setFilePengerjaan(null);
                     setPreviewUnggah(null);
                   }}
-                  className="absolute top-1.5 right-1.5 p-1 bg-black/60 rounded-full text-white"
+                  className="absolute top-1.5 right-1.5 p-1 bg-black/70 rounded-full text-zinc-300 hover:text-white hover:bg-rose-600 transition-colors"
                 >
                   <X className="size-3.5" />
                 </button>
               </div>
             ) : (
-              <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-border rounded-lg cursor-pointer hover:bg-muted/30 transition-colors">
-                <Upload className="size-6 text-muted-foreground mb-1" />
-                <span className="text-xs font-medium text-text">Pilih Foto Pengerjaan</span>
-                <span className="text-[11px] text-muted-foreground">Otomatis WebP & Thumbnail 320px</span>
+              <label className="flex flex-col items-center justify-center w-full h-36 border-2 border-dashed border-zinc-800 rounded-lg cursor-pointer hover:bg-zinc-900/60 hover:border-zinc-700 transition-colors">
+                <Upload className="size-6 text-[#FF2E75] mb-1 opacity-80" />
+                <span className="text-xs font-medium text-white">Pilih Foto Pengerjaan</span>
+                <span className="text-[10px] font-mono text-zinc-500">Otomatis WebP 1600px & Thumbnail 320px</span>
                 <input
                   type="file"
                   accept="image/*"
@@ -282,10 +300,18 @@ export function GaleriFotoWO({
             )}
           </div>
           <div className="flex justify-end gap-2 pt-2">
-            <Button variant="outline" onClick={() => setDialogUnggah(false)}>
+            <Button
+              variant="outline"
+              onClick={() => setDialogUnggah(false)}
+              className="border-zinc-800 bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300"
+            >
               Batal
             </Button>
-            <Button onClick={handleUnggahFotoPengerjaan} disabled={uploading || !filePengerjaan}>
+            <Button
+              onClick={handleUnggahFotoPengerjaan}
+              disabled={uploading || !filePengerjaan}
+              className="bg-primary hover:bg-primary-strong text-white font-medium shadow-md shadow-pink-950/30"
+            >
               {uploading ? <Loader2 className="size-4 animate-spin mr-1.5" /> : null}
               Unggah Foto
             </Button>

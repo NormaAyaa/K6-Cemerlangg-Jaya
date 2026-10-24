@@ -68,18 +68,33 @@ export function TombolHapus({
   return (
     <AlertDialog>
       <AlertDialogTrigger asChild>
-        <Button variant="ghost" size="icon-sm" aria-label={`Hapus ${nama}`} className="text-danger">
-          <Trash2 />
+        <Button
+          variant="ghost"
+          size="icon-sm"
+          aria-label={`Hapus ${nama}`}
+          className="size-7 text-zinc-400 hover:text-rose-400 hover:bg-rose-950/30 transition-colors"
+        >
+          <Trash2 className="size-3.5" />
         </Button>
       </AlertDialogTrigger>
-      <AlertDialogContent>
+      <AlertDialogContent className="bg-[#111116] border border-zinc-800 text-white sm:max-w-md">
         <AlertDialogHeader>
-          <AlertDialogTitle>{aturan.judul}</AlertDialogTitle>
-          <AlertDialogDescription>{nama} akan dihapus permanen.</AlertDialogDescription>
+          <AlertDialogTitle className="text-white text-base font-semibold">
+            {aturan.judul}
+          </AlertDialogTitle>
+          <AlertDialogDescription className="text-xs text-zinc-400">
+            <span className="font-semibold text-zinc-200">{nama}</span> akan dihapus secara permanen dari sistem bengkel.
+          </AlertDialogDescription>
         </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel>Batal</AlertDialogCancel>
-          <AlertDialogAction variant="destructive" onClick={hapus}>
+        <AlertDialogFooter className="gap-2 sm:gap-0">
+          <AlertDialogCancel className="border-zinc-800 bg-zinc-900/80 text-zinc-300 hover:bg-zinc-800 hover:text-white text-xs">
+            Batal
+          </AlertDialogCancel>
+          <AlertDialogAction
+            variant="destructive"
+            onClick={hapus}
+            className="bg-rose-600 hover:bg-rose-700 text-white text-xs font-medium"
+          >
             Hapus
           </AlertDialogAction>
         </AlertDialogFooter>
