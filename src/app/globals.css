@@ -27,7 +27,7 @@
   --color-status-siap-diambil: var(--status-siap-diambil);
   --color-status-diambil: var(--status-diambil);
   --color-status-dibatalkan: var(--status-dibatalkan);
-  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  --shadow-card: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
   --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
@@ -69,57 +69,57 @@
 :root {
   /* Tema Motorsport Technical: Sakura Pink & Carbon Black */
   --primary: #FF2E75;
-  --primary-strong: #E11D5F;
-  --primary-soft: #FFF0F5;
-  --bg-app: #F8FAFC;
-  --bg-panel: #FFFFFF;
-  --text: #09090B;
-  --text-body: #27272A;
-  --text-muted: #71717A;
-  --success: #10B981;
-  --warning: #F59E0B;
-  --danger: #EF4444;
+  --primary-strong: #FF5C93;
+  --primary-soft: #2A0E1A;
+  --bg-app: #09090D;
+  --bg-panel: #111116;
+  --text: #FAFAFA;
+  --text-body: #D4D4D8;
+  --text-muted: #A1A1AA;
+  --success: #34D399;
+  --warning: #FBBF24;
+  --danger: #FB7185;
 
   /* Warna status WO PRD 7.1 dengan aksen motorsport */
-  --status-menunggu: #71717A;
+  --status-menunggu: #A1A1AA;
   --status-dikerjakan: #FF2E75;
-  --status-tertunda: #F59E0B;
-  --status-selesai: #8B5CF6;
-  --status-siap-diambil: #10B981;
-  --status-diambil: #059669;
-  --status-dibatalkan: #EF4444;
+  --status-tertunda: #FBBF24;
+  --status-selesai: #A78BFA;
+  --status-siap-diambil: #34D399;
+  --status-diambil: #10B981;
+  --status-dibatalkan: #FB7185;
 
   /* Tema shadcn/ui */
   --background: var(--bg-app);
   --foreground: var(--text);
   --card: var(--bg-panel);
   --card-foreground: var(--text);
-  --popover: var(--bg-panel);
+  --popover: #16161C;
   --popover-foreground: var(--text);
   --primary-foreground: #FFFFFF;
-  --secondary: var(--primary-soft);
-  --secondary-foreground: var(--primary-strong);
-  --muted: #F4F4F5;
+  --secondary: #1C1C24;
+  --secondary-foreground: var(--text);
+  --muted: #1C1C24;
   --muted-foreground: var(--text-muted);
-  --accent: var(--primary-soft);
-  --accent-foreground: var(--primary-strong);
+  --accent: #1C1C24;
+  --accent-foreground: var(--text);
   --destructive: var(--danger);
-  --border: #E4E4E7;
-  --input: #D4D4D8;
+  --border: #27272A;
+  --input: #3F3F46;
   --ring: #FF2E75;
   --chart-1: #FF2E75;
-  --chart-2: #10B981;
-  --chart-3: #F59E0B;
-  --chart-4: #8B5CF6;
-  --chart-5: #09090B;
+  --chart-2: #34D399;
+  --chart-3: #FBBF24;
+  --chart-4: #A78BFA;
+  --chart-5: #FAFAFA;
   --radius: 8px;
-  --sidebar: #FFFFFF;
-  --sidebar-foreground: #27272A;
+  --sidebar: #0B0B0F;
+  --sidebar-foreground: #D4D4D8;
   --sidebar-primary: #FF2E75;
   --sidebar-primary-foreground: #FFFFFF;
-  --sidebar-accent: #FFF0F5;
-  --sidebar-accent-foreground: #E11D5F;
-  --sidebar-border: #E4E4E7;
+  --sidebar-accent: #2A0E1A;
+  --sidebar-accent-foreground: #FF5C93;
+  --sidebar-border: #27272A;
   --sidebar-ring: #FF2E75;
 }
 
@@ -139,13 +139,13 @@
   .bg-grid-technical {
     background-size: 28px 28px;
     background-image: 
-      linear-gradient(to right, rgba(0, 0, 0, 0.04) 1px, transparent 1px),
-      linear-gradient(to bottom, rgba(0, 0, 0, 0.04) 1px, transparent 1px);
+      linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
   }
 
   .bg-dots-technical {
     background-size: 20px 20px;
-    background-image: radial-gradient(circle, rgba(0, 0, 0, 0.08) 1px, transparent 1px);
+    background-image: radial-gradient(circle, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
   }
 
   .border-chamfer {
